@@ -1,4 +1,4 @@
-# Bayes_2026
+# Bayes 2026
 
 ## Neptun adatok
 
