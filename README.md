@@ -40,7 +40,7 @@ TTK-s Moodle: https://edu.ttk.bme.hu/
 
 **Lee, M.D., & Wagenmakers, E.** (2014). **Bayesian Cognitive Modeling: A Practical Course.**
 
-<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/Kruschke.jpg" width="300">
+<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/Kruschke.jpg" width="300"> 
 
 **Kruschke, J.K.** (2014). **Doing Bayesian Data Analysis:** A Tutorial with R, JAGS, and Stan.
 
