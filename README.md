@@ -36,19 +36,19 @@ TTK-s Moodle: https://edu.ttk.bme.hu/
 
 ## További irodalom
 
-<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/LeeW.jpg" alt="LeeW" width="300">
+<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/LeeW.jpg" width="300">
 
 **Lee, M.D., & Wagenmakers, E.** (2014). **Bayesian Cognitive Modeling: A Practical Course.**
 
-<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/Kruschke.jpg" alt="LeeW" width="300">
+<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/Kruschke.jpg" width="300">
 
 **Kruschke, J.K.** (2014). **Doing Bayesian Data Analysis:** A Tutorial with R, JAGS, and Stan.
 
-<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/bruno.png" alt="LeeW" width="300">
+<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/bruno.png" width="300">
 
-**Nicenboim B., Schad D.J., Vasishth, S.,** 2026-01-13, **Introduction to Bayesian Data Analysis for Cognitive Science**
+**Nicenboim B., Schad D.J., Vasishth, S.,** 2026-01-13, **Introduction to Bayesian Data Analysis for Cognitive Science** https://bruno.nicenboim.me/bayescogsci/
 
-<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/noah.png" alt="LeeW" width="300">
+<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/noah.png" width="300">
 
 **Goodman N.D, Tenenbaum, J.B.** & The ProbMods Contributors: **Probabilistic Models of Cognition** https://probmods.org/
 
