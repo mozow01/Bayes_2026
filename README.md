@@ -36,7 +36,7 @@ TTK-s Moodle: [https://edu.ttk.bme.hu/]
 
 ## További irodalom
 
-![](https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/LeeW.jpg)
+<img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/LeeW.jpg" alt="LeeW" width="300">
 
 Lee, M.D., & Wagenmakers, E. (2014). Bayesian Cognitive Modeling: A Practical Course.
 
