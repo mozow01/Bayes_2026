@@ -30,9 +30,9 @@ Jelenlét (órák 70%), egy beadandó programozási feladat (60 pont), heti rend
 
 Ez a repó.
 
-WebPPL dokumentáció, homemade: [https://mozow01.github.io/WebpplHelp/] 
+WebPPL dokumentáció, homemade: https://mozow01.github.io/WebpplHelp/ 
 
-TTK-s Moodle: [https://edu.ttk.bme.hu/]
+TTK-s Moodle: https://edu.ttk.bme.hu/
 
 ## További irodalom
 
