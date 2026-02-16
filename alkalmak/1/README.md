@@ -52,4 +52,11 @@ Pl. egy közelítő mintavételle: ````Gaussian({mu: 22, sigma: 1})````.
 
 ## Amit eddig tanultunk: hipotézisvizsgálat
 
-H0 (nullhipotézis) : a hörcsög egészséges, $\mu=22$, $\sigma=1$.
+H0 (nullhipotézis) : a hörcsög egészséges, $\mu=22$, az egészséges populációból való.
+
+H1 (alternatív hipotézis) : a hörcsög rendellenesen sovány, $\mu<22$ (egyoldali ellenhipotézis)
+
+Amúgy nagyon gyanús a $\sigma=1$ g, mert nem tudjuk, hogy miből jön ki: -- napi súlyváltozás, -- mérleg pontossága, -- hörcsögök közötti biológiai variancia? Vagy a tényleges matematikai szórás? A 22 jó lesz populációs átlagnak: $\mu_0=22$.
+
+Mit van mit tenni, a mért adatokból becsüljük a $\sigma$ standard deviációt. Erre a szakirodalom egy spéci próbát javasol, a t-próbát: 
+$$t=\dfrac{\overline{x}-\mu_0}{}$$
