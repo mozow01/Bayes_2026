@@ -29,7 +29,7 @@ BMETE91MC26	- Bayesiánus modellezés - 3 kredit - gyakorlat - félévközi jegy
 13. BIC, AIC és Kullback–Leibler-divergencia.
 
 
-## Kurzus oldalak:
+## Kurzus oldalak
 
 Ez a repó.
 
