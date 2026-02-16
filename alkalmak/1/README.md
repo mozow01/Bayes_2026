@@ -59,4 +59,5 @@ H1 (alternatív hipotézis) : a hörcsög rendellenesen sovány, $\mu<22$ (egyol
 Amúgy nagyon gyanús a $\sigma=1$ g, mert nem tudjuk, hogy miből jön ki: -- napi súlyváltozás, -- mérleg pontossága, -- hörcsögök közötti biológiai variancia? Vagy a tényleges matematikai szórás? A 22 jó lesz populációs átlagnak: $\mu_0=22$.
 
 Mit van mit tenni, a mért adatokból becsüljük a $\sigma$ standard deviációt. Erre a szakirodalom egy spéci próbát javasol, a t-próbát: 
-$$t=\dfrac{\overline{x}-\mu_0}{}$$
+
+$$t=\dfrac{\bar{x}-\mu_0}{}$$
