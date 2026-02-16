@@ -55,7 +55,7 @@ TTK-s Moodle: https://edu.ttk.bme.hu/
 
 **Goodman N.D, Tenenbaum, J.B.** & The ProbMods Contributors: **Probabilistic Models of Cognition** https://probmods.org/
 
-## Egyéb WEBPPL tutorialok és minták
+## Egyéb WebPPL tutorialok és minták
 
 https://github.com/tobiasgerstenberg/webppl_tutorial
 
@@ -68,4 +68,3 @@ https://mhtess.github.io/bdappl/
 http://9.660.scripts.mit.edu/chapters/01-webpplBasics.html
 
 https://probmods.github.io/webppl-viz/
-
