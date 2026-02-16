@@ -2,9 +2,9 @@
 
 ## Neptun adatok
 
-**BMETEAGMsCBAYM-00** - Bayesiánus modellezés MC - 3 kredit - gyakorlat - félévközi jegy - számítógépes és kognitív idegtudomány **kötelező tárgy**
+BMETEAGMsCBAYM-00 - Bayesiánus modellezés MC - 3 kredit - gyakorlat - félévközi jegy - számítógépes és kognitív idegtudomány *kötelező tárgy*
 
-**BMETE91MC26**	- Bayesiánus modellezés - 3 kredit - gyakorlat - félévközi jegy - **szabvál**
+BMETE91MC26	- Bayesiánus modellezés - 3 kredit - gyakorlat - félévközi jegy - *szabvál*
 
 ## Számonkérés
 
