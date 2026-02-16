@@ -48,3 +48,8 @@ Van egy törpehörcsögünk, amelyikről azt gyanítjuk, hogy rendellenesen fogy
   <b>Csofi</b>
 </p>
 
+Pl. egy közelítő mintavételle: ````Gaussian({mu: 22, sigma: 1})````.
+
+## Amit eddig tanultunk: hipotézisvizsgálat
+
+H0 (nullhipotézis) : a hörcsög egészséges, $\mu=22$, $\sigma=1$.
