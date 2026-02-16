@@ -37,7 +37,7 @@ WebPPL dokumentáció (homemade) : https://mozow01.github.io/WebpplHelp/
 
 TTK-s Moodle: https://edu.ttk.bme.hu/
 
-(Nagyon lazán kapcsolódó tárgy: Statisztikai tanulás az idegrendszerben (Orebán Gergő) http://golab.wigner.mta.hu/teaching/ )
+(Nagyon lazán kapcsolódó tárgy: Statisztikai tanulás az idegrendszerben (Orbán Gergő) http://golab.wigner.mta.hu/teaching/ )
 
 ## További irodalom
 
