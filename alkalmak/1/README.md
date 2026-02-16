@@ -14,28 +14,29 @@ flip() a szabályos pénzérme eloszlása, de flip és flip() nem ugyanaz
 flip; flip(); sample(flip)
 ````
 
-sample kulcsszó _függvényt_ vár amely valami, ami ilyen alakú:
+sőt, a magáért beszélő sample kulcsszó _függvényt_ vár amely valami, ami ilyen alakú:
 
 ````javascript
 function( ... ) { return ... };
 ````
 
-Pl. ````function(x,y) { return x + y };````
+Pl. ````function(x,y) { return x + y };````. Ilyenek programbeli helye egy függvénydeklarációt kíván: ````var f = function(x,y) { return (x + y) }; ````
 
+Így a nyelvileg helyes parancs:
 
 ````javascript
-sample(flip)
+sample(flip())
 ````
 
 ````javascript
-repeat(4,flip);
+repeat(4,flip());
 ````
 
-
-
-sample(Bernoulli({p: p}))
+Ha cinkelt pénzérmét akarunk, akkor definiálunk kell egy ezt a kifejezést visszaadó függvényt: 
 
 ````javascript
-repeat(5,function () {return flip(0.9)});
+function() { return flip(0.7) };
 ````
+Egyébként ````flip(q)```` az ugyanaz mint ````sample(Bernoulli({p:q})````.
+
 
