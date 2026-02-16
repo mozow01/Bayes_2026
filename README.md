@@ -2,35 +2,36 @@
 
 ## Neptun adatok
 
-BMETEAGMsCBAYM-00 - Bayesiánus modellezés MC - 3 kredit - gyakorlat - félévközi jegy - számítógépes és kognitív idegtudomány kötelező
+**BMETEAGMsCBAYM-00** - Bayesiánus modellezés MC - 3 kredit - gyakorlat - félévközi jegy - számítógépes és kognitív idegtudomány **kötelező tárgy**
 
-BMETE91MC26	- Bayesiánus modellezés - 3 kredit - gyakorlat - félévközi jegy - szabvál
+**BMETE91MC26**	- Bayesiánus modellezés - 3 kredit - gyakorlat - félévközi jegy - **szabvál**
 
 ## Számonkérés
 
-Jelenlét (órák 70%), egy beadandó programozási feladat (60 pont), heti rendszerességű Moodle házi (40 pont)
+**Jelenlét** (az órák 70%-a); egy **beadandó** programozási **feladatcsomag** (60 pont) (ajánlott github oldalon beadni); heti rendszerességű **Moodle házi** (40 pont) ( https://edu.ttk.bme.hu/ )
 
 ## Tematika
 
 1. Bevezetés - Mi a Bayes-féle statisztikai megközelítés?
-2. A valószínűségelmélet frekventista vs. bayesiánus megalapozása
-3. Kombinatorikai és sztochasztikus jelenségek.
-4. Feltételes valószínűség Bayes- és Jeffrey-frissítés. 
-5. Prior és poszterior eloszlások, likelihood függvény, konjugált priorok, informatív és nem informatív priorok.
-6. Programozási gyakorlat
-7. ZH 
-8. Többváltozós valószínűségi eloszlások faktorizációja és a gráfmodell reprezentáció. Generatív modell.
-9. Gyakorlati példák grafikus modellekre és ezek beprogramozása. Markov-lánc Monte Carlo eljárás és inferálási algoritmusok.
-10. Hierarchikus modellek. Bayes-féle adatelemzés, agymodellezés és pszichometrikus elemzés.
-11. Bayes-faktor és kiszámítása. Modell összehasonlítás és validáció.
-12. BIC, AIC és Kullback–Leibler-divergencia.
-13. Ismétlés, adminisztráció
+2. A valószínűségelmélet frekventista ill. bayesiánus megalapozása
+3. Kombinatorikai jelenségek modellezése.
+4. Szochasztikus jelenségek modellezése.
+5. Feltételes valószínűség Bayes- és Jeffrey-frissítés. 
+6. Prior és poszterior eloszlások, likelihood függvény, konjugált priorok, informatív és nem informatív priorok.
+7. Programozási gyakorlat
+8. ZH 
+9. Többváltozós valószínűségi eloszlások faktorizációja és a gráfmodell reprezentáció. Generatív modell.
+10. Gyakorlati példák grafikus modellekre és ezek beprogramozása. Markov-lánc Monte Carlo eljárás és inferálási algoritmusok.
+11. Hierarchikus modellek. Bayes-féle adatelemzés, agymodellezés és pszichometrikus elemzés.
+12. Bayes-faktor és kiszámítása. Modell összehasonlítás és validáció.
+13. BIC, AIC és Kullback–Leibler-divergencia.
+
 
 ## Kurzus oldalak:
 
 Ez a repó.
 
-WebPPL dokumentáció, homemade: https://mozow01.github.io/WebpplHelp/ 
+WebPPL dokumentáció (homemade) : https://mozow01.github.io/WebpplHelp/ 
 
 TTK-s Moodle: https://edu.ttk.bme.hu/
 
