@@ -37,6 +37,6 @@ Ha cinkelt pénzérmét akarunk, akkor definiálunk kell egy ezt a kifejezést v
 ````javascript
 function() { return flip(0.7) };
 ````
-Egyébként ````flip(q)```` az ugyanaz mint ````sample(Bernoulli({p:q})````.
+Egyébként ````flip(q)```` az ugyanaz mint ````sample(Bernoulli({p:q}))````.
 
 
