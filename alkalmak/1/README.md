@@ -39,4 +39,9 @@ function() { return flip(0.7) };
 ````
 Egyébként ````flip(q)```` az ugyanaz mint ````sample(Bernoulli({p:q}))````.
 
+# Mélyvíz
+
+Van egy törpehörcsögünk, amelyikről azt gyanítjuk, hogy rendellenesen fogy. A súlya (tömege :) ) elméletileg egy 22 g közepű 1 g-os szórású normál eloszlás (haranggörbe). El kéne dönteni, hogy orvoshoz kell-e vinni. 
+
+![Csofi](https://github.com/mozow01/Bayes2024/blob/main/1_gyak/horcsi.jpeg)
 
