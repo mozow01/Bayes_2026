@@ -37,6 +37,8 @@ WebPPL dokumentáció (homemade) : https://mozow01.github.io/WebpplHelp/
 
 TTK-s Moodle: https://edu.ttk.bme.hu/
 
+(Nagyon lazán kapcsolódó tárgy: Statisztikai tanulás az idegrendszerben (Orebán Gergő) http://golab.wigner.mta.hu/teaching/ )
+
 ## További irodalom
 
 <img src="https://raw.githubusercontent.com/mozow01/Bayes_2026/main/images/LeeW.jpg" width="300">
