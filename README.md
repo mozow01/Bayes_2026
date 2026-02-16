@@ -8,7 +8,9 @@ BMETE91MC26	- Bayesiánus modellezés - 3 kredit - gyakorlat - félévközi jegy
 
 ## Számonkérés
 
-**Jelenlét** (az órák 70%-a); egy **beadandó** programozási **feladatcsomag** (60 pont) (ajánlott github oldalon beadni); heti rendszerességű **Moodle házi** (40 pont) ( https://edu.ttk.bme.hu/ )
+* jelenlét (az órák 70%-a);
+* egy *beadandó* programozási *feladatcsomag* (60 pont) (ajánlott github oldalon beadni);
+* heti rendszerességű *Moodle házi* (40 pont) ( https://edu.ttk.bme.hu/ )
 
 ## Tematika
 
