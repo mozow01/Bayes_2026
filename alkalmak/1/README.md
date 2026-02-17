@@ -54,11 +54,11 @@ Amúgy nagyon gyanús a $\sigma=1$ g, mert nem tudjuk, hogy miből jön ki: -- n
 
 ## Amit eddig tanultunk: hipotézisvizsgálat
 
-Végül is szeretném tudni, hogy a hürcsög mekkora súlyú. Nyilván valamekkora (valahogy csak vannak a dolgok!!!), de nem tudjuk. Nem örülnénk, ha mondjuk 22-1=21-nél kisebb lenne. Legyen a hörcsög valói súlya $\mu$
+Végül is szeretném tudni, hogy a hürcsög mekkora súlyú. Nyilván valamekkora (valahogy csak vannak a dolgok!!!), de nem tudjuk. Nem örülnénk, ha mondjuk 22-1=21-nél kisebb lenne. Legyen a hörcsög valói súlya $\theta$.
 
-H0 (nullhipotézis) : a hörcsög egészséges, $\theta\geq 20$.
+H0 (nullhipotézis) : az állat egészséges, $\theta\geq 20$.
 
-H1 (alternatív hipotézis) : a hörcsög rendellenesen sovány, $\theta<20$.
+H1 (alternatív hipotézis) : az állat rendellenesen sovány, $\theta<20$.
 
 Hogyan férek hozzá Csofi súlyához? Megmérem. Nyilván többször, mert egy mérés, nem mérés. A súlymérés normál eloszlást követ, Csofi súlyméréseinek adatai: 
 
@@ -70,9 +70,16 @@ $$\bar{x}\sim \mathcal{N}(\theta,\sigma/\sqrt{n})$$
 
 Ezt még mi magunk is le tudnánk vezetni. A probléma, hogy $\sigma$-t, a mérési adatok eloszlásának szórását nem tudjuk (egy képzeletbeli világban megvan minden mérés és abban a világban az adatok szórása lenne az). Ezen a ponton feladjuk, és megkérdezzük a matematikust (Pearson, Gosset), hogy 
 
-_mi az adataink valószínűsége, ha adaton mondjuk 3 mérést értünk és az átlagot gondoljuk a_ $\theta$ _mért értékének, feltéve, hogy_ $\theta\geq 20$
+_mi az adataink valószínűsége, ha adaton mondjuk 3 mérést értünk és az átlagot gondoljuk a_ $\theta$ _mért értékének, feltéve, hogy_ $\theta\geq 20$.
 
+A válasz a következő lesz. Eldöntötted-e, hogy 1. hány mérést végzel és hogy 2. mekkora valószínűséget gondolsz problémásnak? Válaszunk: 
 
+1. igen, 3 mérés.
+2. mondjuk $\alpha=0.05$ alatt már nagyon gyanús (szignifikancia szint).
 
+Akkor számold ki ezt: 
 
 $$t=\dfrac{\bar{x}-21}{s_x/\sqrt{n}}$$
+
+ahol $s_x^2=(\sum (x_i-\bar{x})^2)/(n-1)$. Majd fogj egy t táblázatot és keresd ki, hogy mennyi a p a t-hez. ( https://www.socscistatistics.com/tests/tsinglesample/calculator/ ).
+
