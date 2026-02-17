@@ -70,7 +70,9 @@ $$\bar{x}\sim \mathcal{N}(\theta,\sigma/\sqrt{n})$$
 
 Ezt még mi magunk is le tudnánk vezetni. A probléma, hogy $\sigma$-t, a mérési adatok eloszlásának szórását nem tudjuk (egy képzeletbeli világban megvan minden mérés és abban a világban az adatok szórása lenne az). Ezen a ponton feladjuk, és megkérdezzük a matematikust (Pearson, Gosset), hogy 
 
-_mi az adataink valószínűsége, ha adaton mondjuk 3 mérést értünk és az átlagot gondoljuk a $\theta$ mért értékének, feltéve, hogy $\theta\geq 20$_
+_mi az adataink valószínűsége, ha adaton mondjuk 3 mérést értünk és az átlagot gondoljuk a_ $\theta$ _mért értékének, feltéve, hogy_ $\theta\geq 20$
+
+
 
 
 $$t=\dfrac{\bar{x}-21}{s_x/\sqrt{n}}$$
