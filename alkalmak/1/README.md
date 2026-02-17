@@ -1,171 +1,193 @@
 # Valószínűségi programozás
 
-Olyan programozási nyelv, amelyben nem csak determinisztikus függvényket lehet alkalmazni, hanem "pszeudo-random", sztochasztikus függvényeket is. Egy ilyan a Stanford CoCoLab-ban fejlesztett WebPPL nyelv ( http://webppl.org/ ), ami a JavaScript egy funkcionális töredéke, feldúsítva a valószínűségi függvényekkel és eljárásokkal.
+Olyan programozási nyelv, amelyben nem csak determinisztikus függvényeket lehet alkalmazni, hanem "pszeudo-random", sztochasztikus függvényeket is. Egy ilyen a Stanford CoCoLab-ban fejlesztett WebPPL nyelv ( http://webppl.org/ ), ami a JavaScript egy funkcionális töredéke, feldúsítva a valószínűségi függvényekkel és eljárásokkal.
 
 Egy konkrét dobás:
- 
-````javascript
+ 
+```javascript
 flip(0.7);
-````
+```
 
-flip() a szabályos pénzérme eloszlása, de flip és flip() nem ugyanaz
+A `flip()` a szabályos pénzérme eloszlása, de a `flip` és a `flip()` nem ugyanaz:
 
-````javascript
+```javascript
 flip; flip(); sample(flip)
-````
+```
 
-sőt, a magáért beszélő sample kulcsszó _függvényt_ vár amely valami, ami ilyen alakú:
+Sőt, a magáért beszélő `sample` kulcsszó *függvényt* vár, amely valami ilyesmi alakú:
 
-````javascript
+```javascript
 function( ... ) { return ... };
-````
+```
 
-Pl. ````function(x,y) { return x + y };````. Ilyenek programbeli helye egy függvénydeklarációt kíván: ````var f = function(x,y) { return (x + y) }; ````
+Pl. `function(x,y) { return x + y };`. Ilyenek programbeli helye egy függvénydeklarációt kíván: `var f = function(x,y) { return (x + y) };`
 
 Így a nyelvileg helyes parancs:
 
-````javascript
-sample(flip())
-````
+```javascript
+sample(flip) // vagy sample(function(){ return flip() })
+```
 
-````javascript
-repeat(4,flip());
-````
+```javascript
+repeat(4, flip);
+```
 
-Ha cinkelt pénzérmét akarunk, akkor definiálunk kell egy ezt a kifejezést visszaadó függvényt: 
+Ha cinkelt pénzérmét akarunk, akkor definiálnunk kell egy ezt a kifejezést visszaadó függvényt: 
 
-````javascript
+```javascript
 function() { return flip(0.7) };
-````
-Egyébként ````flip(q)```` az ugyanaz mint ````sample(Bernoulli({p:q}))````.
+```
+Egyébként `flip(q)` az pontosan ugyanaz, mint `sample(Bernoulli({p: q}))`.
+
+---
 
 # Csofi története
 
-Van egy törpehörcsögünk, amelyikről azt gyanítjuk, hogy rendellenesen fogy. A súlya (tömege :) ) elméletileg egy 22 g közepű 1 g-os szórású normál eloszlás (haranggörbe). El kéne dönteni, hogy orvoshoz kell-e vinni. 
+Van egy törpehörcsögünk, amelyikről azt gyanítjuk, hogy rendellenesen fogy. A súlya (tömege) elméletileg egy 22 g közepű 1 g-os szórású normál eloszlás (haranggörbe). El kéne dönteni, hogy orvoshoz kell-e vinni. 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mozow01/Bayes2024/main/1_gyak/horcsi.jpeg" alt="Csofi"><br>
-  <b>Csofi</b>
+  <img src="https://raw.githubusercontent.com/mozow01/Bayes2024/main/1_gyak/horcsi.jpeg" alt="Csofi" width="300"><br>
+  <b>Csofi</b>
 </p>
 
-Pl. egy közelítő mintavételle: ````Gaussian({mu: 22, sigma: 1})````.
+Például egy közelítő mintavétellel: `Gaussian({mu: 22, sigma: 1})`.
 
-Amúgy nagyon gyanús a $\sigma=1$ g, mert nem tudjuk, hogy miből jön ki: -- napi súlyváltozás, -- mérleg pontossága, -- hörcsögök közötti biológiai variancia? Vagy a tényleges matematikai szórás? A 22 jó lesz populációs átlagnak: $\mu_0=22$, de ezzel önmagában nem tudunk mit kezdeni... Ott vagyunk a kezünkben egy sovec hörcsöggel.
+Amúgy nagyon gyanús a $\sigma = 1$ g, mert nem tudjuk, hogy miből jön ki: napi súlyváltozás, a mérleg pontossága, vagy a hörcsögök közötti biológiai variancia? Vagy a tényleges matematikai szórás? A 22 jó lesz populációs átlagnak: $\mu_0 = 22$, de ezzel önmagában nem tudunk mit kezdeni... Ott állunk, kezünkben egy sovány hörcsöggel.
+
+---
 
 ## Amit eddig tanultunk: hipotézisvizsgálat
 
-Végül is szeretném tudni, hogy a hürcsög mekkora súlyú. Nyilván valamekkora (valahogy csak vannak a dolgok!!!), de nem tudjuk. Nem örülnénk, ha mondjuk 22-1=21-nél kisebb lenne. Legyen a hörcsög valói súlya $\theta$.
+Végül is szeretném tudni, hogy a hörcsög mekkora súlyú. Nyilván valamekkora (valahogy csak vannak a dolgok!!!), de nem tudjuk. Nem örülnénk, ha mondjuk $22 - 1 = 21$-nél kisebb lenne. Legyen a hörcsög valódi súlya $\theta$.
 
-H0 (nullhipotézis) : az állat egészséges, $\theta\geq 20$.
+* **H0 (nullhipotézis):** az állat egészséges, $\theta \geq 20$.
+* **H1 (alternatív hipotézis):** az állat rendellenesen sovány, $\theta < 20$.
 
-H1 (alternatív hipotézis) : az állat rendellenesen sovány, $\theta<20$.
+Hogyan férek hozzá Csofi súlyához? Megmérem. Nyilván többször, mert egy mérés, nem mérés. A súlymérés normál eloszlást követ, Csofi súlyméréseinek adatai: 
 
-Hogyan férek hozzá Csofi súlyához? Megmérem. Nyilván többször, mert egy mérés, nem mérés. A súlymérés normál eloszlást követ, Csofi súlyméréseinek adatai: 
+$$ x \sim \mathcal{N}(\theta, \sigma) $$
 
-$$x\sim \mathcal{N}(\theta,\sigma).$$
+Az adatok átlagára ugyanez: 
 
-Az adatok átlagára ugyenez: 
+$$ \bar{x} \sim \mathcal{N}(\theta, \sigma/\sqrt{n}) $$
 
-$$\bar{x}\sim \mathcal{N}(\theta,\sigma/\sqrt{n})$$
+Ezt még mi magunk is le tudnánk vezetni. A probléma, hogy $\sigma$-t, a mérési adatok eloszlásának szórását nem tudjuk (egy képzeletbeli világban megvan minden mérés, és abban a világban az adatok szórása lenne az). Ezen a ponton feladjuk, és megkérdezzük a matematikust (Pearson, Gosset), hogy: 
 
-Ezt még mi magunk is le tudnánk vezetni. A probléma, hogy $\sigma$-t, a mérési adatok eloszlásának szórását nem tudjuk (egy képzeletbeli világban megvan minden mérés és abban a világban az adatok szórása lenne az). Ezen a ponton feladjuk, és megkérdezzük a matematikust (Pearson, Gosset), hogy 
+*Mi az adataink $p$ valószínűsége, ha adaton mondjuk 3 mérést értünk és az átlagot gondoljuk a $\theta$ mért értékének, feltéve, hogy $\theta \geq 20$?*
 
-_mi az adataink p valószínűsége, ha adaton mondjuk 3 mérést értünk és az átlagot gondoljuk a_ $\theta$ _mért értékének, feltéve, hogy_ $\theta\geq 20$.
+A válasz a következő lesz. Eldöntötted-e, hogy:
+1.  hány mérést végzel?
+2.  mekkora valószínűséget gondolsz problémásnak? 
 
-A válasz a következő lesz. Eldöntötted-e, hogy 1. hány mérést végzel és hogy 2. mekkora valószínűséget gondolsz problémásnak? Válaszunk: 
+Válaszunk: 
+1.  Igen, 3 mérés.
+2.  Mondjuk $\alpha = 0.05$ alatt már nagyon gyanús (szignifikancia szint).
 
-1. igen, 3 mérés.
-2. mondjuk $\alpha=0.05$ alatt már nagyon gyanús (szignifikancia szint).
+Akkor számold ki ezt: 
 
-Akkor számold ki ezt: 
+$$ t = \frac{\bar{x} - 21}{s_x/\sqrt{n}} $$
 
-$$t=\dfrac{\bar{x}-21}{s_x/\sqrt{n}}$$
+ahol $s_x^2 = \frac{\sum (x_i-\bar{x})^2}{n-1}$. Majd fogj egy t-táblázatot, és keresd ki, hogy mennyi a $p$ a $t$-hez.
 
-ahol $s_x^2=(\sum (x_i-\bar{x})^2)/(n-1)$. Majd fogj egy t táblázatot és keresd ki, hogy mennyi a p a t-hez. ( https://www.socscistatistics.com/tests/tsinglesample/calculator/ ).
+Mivel $p = 0.019$, ezért 0.05 szinten szignifikáns az eltérés, azaz 1000 mérésből csak 19 lenne olyan, amelyik ilyen, mint ez. Ez nagyon kevés. Valami baj van, Csofi súlya nincs összhangban azzal, hogy a 20-nál nagyobbak az egészséges állatok értékei. A nullhipotézist elvethetjük.
 
-Mivel $p=0.019$, ezért $0.05$ szinten szignifikáns az eltérés, azaz 1000 mérésből csak 19 lenne olyan, amelyik ilyen, mint ez. Ez nagyon kevés. Valami baj van, Csofi súlya nincs összhangban azzal, hogy a 20-nál nagyobbak az egészséges állatok értékei.
+### Naiv, álnaiv kérdések (és a két tábor válaszai)
 
-A nullhipotézist elvethetjük.
+**1. Értem a haranggörbét, de mi az a t-statisztika? Mi ez a "made-up" dolog?**
+* **Frekventista:** Ez egy standardizált távolság. Megmutatja, hányszorosa a mért átlag a standard hibának. A számításhoz kell.
+* **Bayesiánus:** Teljesen igazad van, ez egy felesleges absztrakció. Mi nem $t$-értékeket számolunk, hanem közvetlenül Csofi súlyának valószínűségét modellezzük.
 
-### Naiv, álnaiv kérdések
+**2. Miért az az alternatív hipotézis, hogy $\theta < 20$? Miért nem vizsgáljuk a beteg (17 g) vs. egészséges (22 g) állapotot közvetlenül?**
+* **Frekventista:** Mert a klasszikus keretrendszer csak a nullhipotézist tudja tesztelni, és egy küszöböt ($\alpha$) vizsgálni ellene.
+* **Bayesiánus:** Pontosan ezt fogjuk tenni! Felveszünk egy modellt az egészséges és egyet a beteg állapotra, majd megnézzük, az adatok melyiket támogatják jobban.
 
-1. Értem, hogy a súly haranggörbe, mert nem vagyok hülye, de akkor mi az a t statisztika? Mi ez a made-up dolog?
-2. Mennyiben "betegesen" rendellenes egy 20-nál kisebb érték? Miért ez az alternatív hipotézis? Miért nem mondjuk az, hogy 17 g +- 1 g ? 
-3. A próba alapján két választ kaphatok: A) nem vethető el a nullhipotézis, B) elvethető a nullhipotézis. Egyik esetben sem a minket érdeklő kérdésre kapunk választ.
-4. Mi az a t-képlet? Jelent valamit vagy nem jelent semmit? (Miért kell statisztikusnak lennem?)
-5. Tudom, hogy a próba annál jobb, minél többször mérem a hörcsit. Miért kéne nyaggatni szegényt mondjuk 100 méréssel egy értelmezhetetlen eredmény miatt? Miért úgy csinálom a mérést, mint egy sörgyáros? Miér nem úgy, ahogy egy állatorvos?  
+**3. Csak "elvetem / nem vetem el" választ kapok. Engem a súlya érdekel!**
+* **Frekventista:** A valós súly fix, csak nem ismerjük. Csak a döntésünk hosszú távú megbízhatóságát tudjuk tesztelni.
+* **Bayesiánus:** A frekventista módszer rossz kérdést tesz fel. Mi visszaadjuk neked a tényleges súly legvalószínűbb eloszlását az adatok fényében.
 
-## Bayes-féle megközelítés
+**4. Mi ez a t-képlet? Miért kell statisztikusnak lennem?**
+* **Frekventista:** Ez egy analitikus megoldás a számítógépek előtti korból, amivel a normál eloszlás területét közelítjük.
+* **Bayesiánus:** Nem kell statisztikusnak lenned. Leírod a folyamatot egy WebPPL kódba, a gép pedig elvégzi a szimulációt helyetted.
 
-Csofi súlya egy bizonytalan érték (inherensen bizonytalan). Két dolgot tudunk, hogy Gauss(22,1) egy egészséges állat súlya, Gauss(17,1) egy betegé. Csofi a mérések alapján 19, 18, 18 g. Ez eléggé leszűkíti a lehetősőgeket. Ha kiszórjuk azokat a szcenáriókat, amelyekben ezek a számok nagyon pici valószínűségűek, akkor egy olyan eloszlást kapunk a súlyára, amelyik közel állhat a valósághoz. 
+**5. Miért kéne 100 méréssel nyaggatni a hörcsögöt? Miért úgy mérünk, mint egy sörgyáros minőségellenőr, miért nem úgy, ahogy egy állatorvos?**
+* **Frekventista:** Mert kis minta esetén a t-próba statisztikai ereje (power) gyenge. (William Sealy Gosset, a t-próba feltalálója tényleg a Guinness sörgyár minőségellenőre volt!).
+* **Bayesiánus:** Az állatorvosnak van *előzetes tudása* (prior) arról, milyen egy hörcsög. Ha ezt a tudást beépítjük a modellbe, már 3 mérésből (19, 18, 18) is pontos diagnózist kapunk!
 
-````javascript
+---
+
+## Bayes-féle megközelítés (Állatorvosi mód)
+
+Csofi súlya egy bizonytalan érték (inherensen bizonytalan). Két dolgot tudunk: $Gauss(22,1)$ egy egészséges állat súlya, $Gauss(17,1)$ egy betegé. Csofi a mérések alapján 19, 18, 18 g. Ez eléggé leszűkíti a lehetőségeket. 
+
+Ha felállítunk két modellt, a gép ki tudja számolni, melyik a valószínűbb!
+
+```javascript
 var data = [
-  {k: 19},
-  {k: 18},
-  {k: 18}
+  {k: 19},
+  {k: 18},
+  {k: 18}
 ];
 
 var Model = function() {
-  // modell index: 1 = rgészséges, 2 = beteg
-  var i = categorical({vs: [1, 2], ps: [0.5, 0.5]});
+  // Prior: modell index: 1 = egészséges, 2 = beteg
+  // Kezdetben 50-50% esélyt adunk mindkettőnek
+  var i = categorical({vs: [1, 2], ps: [0.5, 0.5]});
 
-  // i-től függő m
-  var m = (i === 1) ? gaussian(22, 1) : gaussian(17, 1);
+  // i-től függő populációs átlag (m)
+  var m = (i === 1) ? gaussian(22, 1) : gaussian(17, 1);
 
-  // likelihood
-  map(function(d){
-    observe(Gaussian({mu: m, sigma: 1}), d.k);
-  }, data);
+  // Likelihood: a mérések beillesztése a modellbe
+  map(function(d){
+    observe(Gaussian({mu: m, sigma: 1}), d.k);
+  }, data);
 
-  // a modell indexét és a közepet kapjuk vissza
-  return {i: i};
+  // A modell indexét kapjuk vissza (vajon 1 vagy 2 lesz?)
+  return {i: i};
 };
 
-
+// Inferencia (A számítógép "gondolkodik")
 var opts = {method: 'SMC', particles: 3000, rejuvSteps: 5};
 var post = Infer(opts, Model);
 
-
 viz.marginals(post);
-print("i");
+print("Poszterior eloszlás a modellekre (i)");
 
-// Priorok:
+// ---------------------------------------------------
+// Priorok ellenőrzése (Mik voltak az eredeti feltevések?)
 var PriorHealthy = function() {
-  var m = gaussian(22, 1);
-  return {m: m};
+  var m = gaussian(22, 1);
+  return {m: m};
 };
 
 var PriorSick = function() {
-  var m = gaussian(17, 1);
-  return {m: m};
+  var m = gaussian(17, 1);
+  return {m: m};
 };
 
 var priorOpts = {method: 'forward', samples: 5000};
-
 var prior1 = Infer(priorOpts, PriorHealthy);
 var prior2 = Infer(priorOpts, PriorSick);
 
-
 viz.marginals(prior1);
-print("N(22,1)");
-
+print("Egészséges prior: N(22,1)");
 
 viz.marginals(prior2);
-print("N(17,1)");
+print("Beteg prior: N(17,1)");
 
+print("A mért adatok átlaga:");
 print((19+18+18)/3);
-````
+```
+
+---
 
 ## Összevetés
 
-|                   | Frekventista statisztika                             | Bayesiánus statisztika                                 |
-|-----------------------------|------------------------------------------------------|------------------------------------------------------|
-| Alapelvek                   | Egyetlen matematikailag kifundált mintatérből vesz mintákat és ezek alapján következtet. | Előzetes tudással (prior), adattal (megfigyelt változó) és adatfelvétel után levont (poszterior)  következtetésekkel dolgozik. |
-| Előzetes elvárások          | Nem utal előzetes tudásra, csak a mintavételezéskor keletkező mintára összpontosít. Az előzetes tudás tacit. | Bevezeti a prior elvárásokat, amelyek a kezdeti ismereteket és hozzáértést tükrözik. Explicit előzetes tudással dolgozik.                |
-| Paraméterek értelmezése     | A paraméterek fix értékek, amelyek ismeretlenek, de konstansok.                                | A paraméterek valószínűségi eloszlások formájában jelennek meg.  |
-| Bizonytalanság kezelése      | A bizonytalanságot konfidencia intervallumokkal fejezi ki, az intervallum végpontjai egyfajta kétpontú pontbecslés. A 95%-os konfidenciaintervallum azt jelenti, hogy az ismeretlen paraméter 95%-os valószínűséggel található meg a kiszámított tartományban.                                             | A paraméternek inherens bizonytalansága van, amit valószínűségi eloszlásos formájában feltételez. Így egy ilyen következtetés nem pontszerű, hanem eloszlást ad vissza. Ennek legsűrűbb intervalluma a 95%-os HDI.   |
-| Adatkövetelmény              | Gyakran nagy mintaméretet igényel, hogy az eredmények stabilak legyenek.                                  | Használható kis minta esetén is, mivel a prior tudás rásegít az adatokra. |       
-| Adatfeldolgozás              | Kész analitikusan levezetett képletek a számítógép előtti korból, normalitási, függetlenségi feltételekkel. Táblázatokra, statisztikusi tapasztalatra hivatkozik.                            | Egységes elméleti keretrendszert ajánl fel: előzetes tudás + aktuális adat -> aktuális tudás, számítógéppel számolja a következtetéseket. |                        |
-|  Jelenségek modellezése              | Mintavételzési eljárásokkal dolgozik.  | Igazodik a természettudományos, valódi kísérletekhez, ezeket formalizálja, explicitté teszi.    |               
-| Interpretáció               | Gyakran konfidencia intervallumokkal és hipotézisvizsgálatal dolgozik, amelyek értelmezése nehézkes, körmönfont.  | A valószínűségi értelmezés miatt könnyebb értelmezni a statisztikai eredményeket.                   |
+| Kritérium | Frekventista statisztika | Bayesiánus statisztika |
+| :--- | :--- | :--- |
+| **Alapelvek** | Egyetlen matematikailag kifundált mintatérből vesz mintákat, és ezek alapján következtet. | Előzetes tudással (prior), adattal (megfigyelés) és adatfelvétel után levont következtetéssel (poszterior) dolgozik. |
+| **Előzetes elvárások** | Nem utal előzetes tudásra, csak a mintavételezéskor keletkező mintára összpontosít. Az előzetes tudás *tacit* (rejtett). | Bevezeti a prior elvárásokat, amelyek a kezdeti ismereteket tükrözik. *Explicit* előzetes tudással dolgozik. |
+| **Paraméterek értelmezése** | A paraméterek fix értékek, amelyek ismeretlenek, de konstansok. | A paraméterek valószínűségi változók, eloszlások formájában jelennek meg. |
+| **Bizonytalanság kezelése** | Konfidencia intervallumokkal fejezi ki (egyfajta kétpontú pontbecslés), aminek az értelmezése körmönfont. | A paraméternek inherens bizonytalansága van (eloszlás). Teljes valószínűségi térképet kapunk. |
+| **Adatkövetelmény** | Gyakran nagy mintaméretet igényel (sörgyáros), hogy az eredmények stabilak legyenek. | Használható nagyon pici minta esetén is (állatorvos), mivel a prior tudás rásegít az adatokra. |
+| **Adatfeldolgozás** | Kész analitikusan levezetett képletek, normalitási, függetlenségi feltételekkel. | Egységes elméleti keretrendszer számítógépes szimulációval: Prior + Adat $\rightarrow$ Poszterior. |
+| **Interpretáció** | Hipotézisvizsgálattal dolgozik (p-érték), ahol csak elvetni tudunk, megerősíteni nem. | Generatív modellezéssel dolgozik, ahol a modellek valószínűségét is össze tudjuk mérni. |
