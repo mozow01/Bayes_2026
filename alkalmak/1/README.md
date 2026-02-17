@@ -50,14 +50,27 @@ Van egy törpehörcsögünk, amelyikről azt gyanítjuk, hogy rendellenesen fogy
 
 Pl. egy közelítő mintavételle: ````Gaussian({mu: 22, sigma: 1})````.
 
+Amúgy nagyon gyanús a $\sigma=1$ g, mert nem tudjuk, hogy miből jön ki: -- napi súlyváltozás, -- mérleg pontossága, -- hörcsögök közötti biológiai variancia? Vagy a tényleges matematikai szórás? A 22 jó lesz populációs átlagnak: $\mu_0=22$, de ezzel önmagában nem tudunk mit kezdeni... Ott vagyunk a kezünkben egy sovec hörcsöggel.
+
 ## Amit eddig tanultunk: hipotézisvizsgálat
 
-H0 (nullhipotézis) : a hörcsög egészséges, $\mu=22$, az egészséges populációból való.
+Végül is szeretném tudni, hogy a hürcsög mekkora súlyú. Nyilván valamekkora (valahogy csak vannak a dolgok!!!), de nem tudjuk. Nem örülnénk, ha mondjuk 22-1=21-nél kisebb lenne. Legyen a hörcsög valói súlya $\mu$
 
-H1 (alternatív hipotézis) : a hörcsög rendellenesen sovány, $\mu<22$ (egyoldali ellenhipotézis)
+H0 (nullhipotézis) : a hörcsög egészséges, $\theta\geq 20$.
 
-Amúgy nagyon gyanús a $\sigma=1$ g, mert nem tudjuk, hogy miből jön ki: -- napi súlyváltozás, -- mérleg pontossága, -- hörcsögök közötti biológiai variancia? Vagy a tényleges matematikai szórás? A 22 jó lesz populációs átlagnak: $\mu_0=22$.
+H1 (alternatív hipotézis) : a hörcsög rendellenesen sovány, $\theta<20$.
 
-Mit van mit tenni, a mért adatokból becsüljük a $\sigma$ standard deviációt. Erre a szakirodalom egy spéci próbát javasol, a t-próbát: 
+Hogyan férek hozzá Csofi súlyához? Megmérem. Nyilván többször, mert egy mérés, nem mérés. A súlymérés normál eloszlást követ, Csofi súlyméréseinek adatai: 
 
-$$t=\dfrac{\bar{x}-\mu_0}{}$$
+$$x\sim \mathcal{N}(\theta,\sigma).$$
+
+Az adatok átlagára ugyenez: 
+
+$$\bar{x}\sim \mathcal{N}(\theta,\sigma/\sqrt{n})$$
+
+Ezt még mi magunk is le tudnánk vezetni. A probléma, hogy $\sigma$-t, a mérési adatok eloszlásának szórását nem tudjuk (egy képzeletbeli világban megvan minden mérés és abban a világban az adatok szórása lenne az). Ezen a ponton feladjuk, és megkérdezzük a matematikust (Pearson, Gosset), hogy 
+
+_mi az adataink valószínűsége, ha adaton mondjuk 3 mérést értünk és az átlagot gondoljuk a $\theta$ mért értékének, feltéve, hogy $\theta\geq 20$_
+
+
+$$t=\dfrac{\bar{x}-21}{s_x/\sqrt{n}}$$
