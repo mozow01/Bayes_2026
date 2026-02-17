@@ -94,28 +94,28 @@ Mivel $p = 0.019$, ezért 0.05 szinten szignifikáns az eltérés, azaz 1000 mé
 ### Naiv, álnaiv kérdések (és a két tábor válaszai)
 
 **1. Értem a haranggörbét, de mi az a t-statisztika? Mi ez a "made-up" dolog?**
-* **Frekventista:** Ez egy standardizált távolság. Megmutatja, hányszorosa a mért átlag a standard hibának. A számításhoz kell.
-* **Bayesiánus:** Teljesen igazad van, ez egy felesleges absztrakció. Mi nem $t$-értékeket számolunk, hanem közvetlenül Csofi súlyának valószínűségét modellezzük.
+* **Frekventista:** Ez egy standardizált távolság, megmutatja, hogy a standard hiba hányszorosa a mért átlag eltérése a középtől.
+* **Bayesiánus:** Ez egy teljesen felesleges absztrakció. Mi nem $t$-értékkel fogunk számolni, hanem közvetlenül Csofi súlyának valószínűségét fogjuk modellezni.
 
 **2. Miért az az alternatív hipotézis, hogy $\theta < 20$? Miért nem vizsgáljuk a beteg (17 g) vs. egészséges (22 g) állapotot közvetlenül?**
-* **Frekventista:** Mert a klasszikus keretrendszer csak a nullhipotézist tudja tesztelni, és egy küszöböt ($\alpha$) vizsgálni ellene.
-* **Bayesiánus:** Pontosan ezt fogjuk tenni! Felveszünk egy modellt az egészséges és egyet a beteg állapotra, majd megnézzük, az adatok melyiket támogatják jobban.
+* **Frekventista:** Mert csak a nullhipotézist és a mintavételezési eljárást tudunk matematikailag tesztelni, és egy küszöböt ($\alpha$) vizsgálni.
+* **Bayesiánus:** Pont ezt fogjuk tenni! Felveszünk egy modellt az egészséges és a beteg állatra, és megnézzük, hogy az adatok melyiket támogatják jobban.
 
 **3. Csak "elvetem / nem vetem el" választ kapok. Engem a súlya érdekel!**
-* **Frekventista:** A valós súly fix, csak nem ismerjük. Csak a döntésünk hosszú távú megbízhatóságát tudjuk tesztelni.
-* **Bayesiánus:** A frekventista módszer rossz kérdést tesz fel. Mi visszaadjuk neked a tényleges súly legvalószínűbb eloszlását az adatok fényében.
+* **Frekventista:** A valós súly fix, csak nem ismerjük. A döntésünk hosszú távú megbízhatóságát tudjuk tesztelni.
+* **Bayesiánus:** A frekventista módszer nem arra ad válasz, ami a kérdés. Mi visszaadjuk a tényleges súly legvalószínűbb eloszlását az adatok tükrében.
 
 **4. Mi ez a t-képlet? Miért kell statisztikusnak lennem?**
 * **Frekventista:** Ez egy analitikus megoldás a számítógépek előtti korból, amivel a normál eloszlás területét közelítjük.
-* **Bayesiánus:** Nem kell statisztikusnak lenned. Leírod a folyamatot egy WebPPL kódba, a gép pedig elvégzi a szimulációt helyetted.
+* **Bayesiánus:** Nem kell statisztikusnak lenned! Leírod a folyamatot egy kódba, a gép pedig elvégzi a számítást.
 
 **5. Miért kéne 100 méréssel nyaggatni a hörcsögöt? Miért úgy mérünk, mint egy sörgyáros minőségellenőr, miért nem úgy, ahogy egy állatorvos?**
-* **Frekventista:** Mert kis minta esetén a t-próba statisztikai ereje (power) gyenge. (William Sealy Gosset, a t-próba feltalálója tényleg a Guinness sörgyár minőségellenőre volt!).
-* **Bayesiánus:** Az állatorvosnak van *előzetes tudása* (prior) arról, milyen egy hörcsög. Ha ezt a tudást beépítjük a modellbe, már 3 mérésből (19, 18, 18) is pontos diagnózist kapunk!
+* **Frekventista:** Mert kis minta esetén a t-próba statisztikai ereje gyenge. 
+* **Bayesiánus:** Az állatorvosnak van *előzetes tudása* (prior) arról, milyen egy hörcsög. Ha ezt a tudást **beépítjük** a modellbe, már kevés mérésből is pontos diagnózist kapunk!
 
 ---
 
-## Bayes-féle megközelítés (Állatorvosi mód)
+## Bayes-féle megközelítés
 
 Csofi súlya egy bizonytalan érték (inherensen bizonytalan). Két dolgot tudunk: $Gauss(22,1)$ egy egészséges állat súlya, $Gauss(17,1)$ egy betegé. Csofi a mérések alapján 19, 18, 18 g. Ez eléggé leszűkíti a lehetőségeket. 
 
