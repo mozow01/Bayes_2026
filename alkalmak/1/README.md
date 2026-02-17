@@ -184,10 +184,10 @@ print((19+18+18)/3);
 
 | Kritérium | Frekventista statisztika | Bayesiánus statisztika |
 | :--- | :--- | :--- |
-| **Alapelvek** | Egyetlen matematikailag kifundált mintatérből vesz mintákat, és ezek alapján következtet. | Előzetes tudással (prior), adattal (megfigyelés) és adatfelvétel után levont következtetéssel (poszterior) dolgozik. |
-| **Előzetes elvárások** | Nem utal előzetes tudásra, csak a mintavételezéskor keletkező mintára összpontosít. Az előzetes tudás *tacit* (rejtett). | Bevezeti a prior elvárásokat, amelyek a kezdeti ismereteket tükrözik. *Explicit* előzetes tudással dolgozik. |
-| **Paraméterek értelmezése** | A paraméterek fix értékek, amelyek ismeretlenek, de konstansok. | A paraméterek valószínűségi változók, eloszlások formájában jelennek meg. |
-| **Bizonytalanság kezelése** | Konfidencia intervallumokkal fejezi ki (egyfajta kétpontú pontbecslés), aminek az értelmezése körmönfont. | A paraméternek inherens bizonytalansága van (eloszlás). Teljes valószínűségi térképet kapunk. |
-| **Adatkövetelmény** | Gyakran nagy mintaméretet igényel (sörgyáros), hogy az eredmények stabilak legyenek. | Használható nagyon pici minta esetén is (állatorvos), mivel a prior tudás rásegít az adatokra. |
-| **Adatfeldolgozás** | Kész analitikusan levezetett képletek, normalitási, függetlenségi feltételekkel. | Egységes elméleti keretrendszer számítógépes szimulációval: Prior + Adat $\rightarrow$ Poszterior. |
-| **Interpretáció** | Hipotézisvizsgálattal dolgozik (p-érték), ahol csak elvetni tudunk, megerősíteni nem. | Generatív modellezéssel dolgozik, ahol a modellek valószínűségét is össze tudjuk mérni. |
+| **Alapelvek** | Egyetlen feltételezett mintatérből vett tömeges minták alapján hoz döntést. | Az előzetes ismereteket és a friss adatokat ötvözve mutatja meg a lehetséges válaszok valószínűségét. |
+| **Előzetes elvárások** | Nem vesz figyelembe semmilyen előzetes tudást a vizsgálat tárgyáról. | A kezdeti szakmai ismereteket tudatosan beépíti a matematikai modellbe. |
+| **Paraméterek értelmezése** | A keresett értékeket ismeretlen, de állandó fix számoknak tekinti. | A keresett értékeket természetes bizonytalansággal rendelkező eloszlásokként kezeli. |
+| **Bizonytalanság kezelése** | Nehezen értelmezhető intervallumokkal próbálja megbecsülni a tévedés esélyét. | Egy teljes és könnyen leolvasható valószínűségi térképet ad a lehetséges kimenetelekről. |
+| **Adatkövetelmény** | Megbízható eredmény eléréséhez nagyszámú mérési adatra van szüksége. | Az előzetes tudás felhasználása miatt akár néhány mérés is elegendő lehet a döntéshez. |
+| **Adatfeldolgozás** | Szigorú feltételekhez kötött, kész képletekbe helyettesíti be az adatokat. | Számítógépes szimuláció segítségével alkot egységes elméleti keretet a következtetéshez. |
+| **Interpretáció** | Csak elvetni tud egy feltételezést egy határérték alapján, megerősíteni nem. | Közvetlenül össze tudja mérni és rangsorolni a különböző magyarázó modellek valószínűségét. |
