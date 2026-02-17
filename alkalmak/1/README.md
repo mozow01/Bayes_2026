@@ -83,3 +83,89 @@ $$t=\dfrac{\bar{x}-21}{s_x/\sqrt{n}}$$
 
 ahol $s_x^2=(\sum (x_i-\bar{x})^2)/(n-1)$. Majd fogj egy t táblázatot és keresd ki, hogy mennyi a p a t-hez. ( https://www.socscistatistics.com/tests/tsinglesample/calculator/ ).
 
+Mivel $p=0.019$, ezért $0.05$ szinten szignifikáns az eltérés, azaz 1000 mérésből csak 19 lenne olyan, amelyik ilyen, mint ez. Ez nagyon kevés. Valami baj van, Csofi súlya nincs összhangban azzal, hogy a 20-nál nagyobbak az egészséges állatok értékei.
+
+A nullhipotézist elvethetjük.
+
+### Naiv, álnaiv kérdések
+
+1. Értem, hogy a súly haranggörbe, mert nem vagyok hülye, de akkor mi az a t statisztika? Mi ez a made-up dolog?
+2. Mennyiben "betegesen" rendellenes egy 20-nál kisebb érték? Miért ez az alternatív hipotézis? Miért nem mondjuk az, hogy 17 g +- 1 g ? 
+3. A próba alapján két választ kaphatok: A) nem vethető el a nullhipotézis, B) elvethető a nullhipotézis. Egyik esetben sem a minket érdeklő kérdésre kapunk választ.
+4. Mi az a t-képlet? Jelent valamit vagy nem jelent semmit? (Miért kell statisztikusnak lennem?)
+5. Tudom, hogy a próba annál jobb, minél többször mérem a hörcsit. Miért kéne nyaggatni szegényt mondjuk 100 méréssel egy értelmezhetetlen eredmény miatt? Miért úgy csinálom a mérést, mint egy sörgyáros? Miér nem úgy, ahogy egy állatorvos?  
+
+## Bayes-féle megközelítés
+
+Csofi súlya egy bizonytalan érték (inherensen bizonytalan). Két dolgot tudunk, hogy Gauss(22,1) egy egészséges állat súlya, Gauss(17,1) egy betegé. Csofi a mérések alapján 19, 18, 18 g. Ez eléggé leszűkíti a lehetősőgeket. Ha kiszórjuk azokat a szcenáriókat, amelyekben ezek a számok nagyon pici valószínűségűek, akkor egy olyan eloszlást kapunk a súlyára, amelyik közel állhat a valósághoz. 
+
+````javascript
+var data = [
+  {k: 19},
+  {k: 18},
+  {k: 18}
+];
+
+var Model = function() {
+  // modell index: 1 = rgészséges, 2 = beteg
+  var i = categorical({vs: [1, 2], ps: [0.5, 0.5]});
+
+  // i-től függő m
+  var m = (i === 1) ? gaussian(22, 1) : gaussian(17, 1);
+
+  // likelihood
+  map(function(d){
+    observe(Gaussian({mu: m, sigma: 1}), d.k);
+  }, data);
+
+  // a modell indexét és a közepet kapjuk vissza
+  return {i: i};
+};
+
+
+var opts = {method: 'SMC', particles: 3000, rejuvSteps: 5};
+var post = Infer(opts, Model);
+
+
+viz.marginals(post);
+print("i");
+
+// Priorok:
+var PriorHealthy = function() {
+  var m = gaussian(22, 1);
+  return {m: m};
+};
+
+var PriorSick = function() {
+  var m = gaussian(17, 1);
+  return {m: m};
+};
+
+var priorOpts = {method: 'forward', samples: 5000};
+
+var prior1 = Infer(priorOpts, PriorHealthy);
+var prior2 = Infer(priorOpts, PriorSick);
+
+
+viz.marginals(prior1);
+print("N(22,1)");
+
+
+viz.marginals(prior2);
+print("N(17,1)");
+
+print((19+18+18)/3);
+````
+
+## Összevetés
+
+|                   | Frekventista statisztika                             | Bayesiánus statisztika                                 |
+|-----------------------------|------------------------------------------------------|------------------------------------------------------|
+| Alapelvek                   | Egyetlen matematikailag kifundált mintatérből vesz mintákat és ezek alapján következtet. | Előzetes tudással (prior), adattal (megfigyelt változó) és adatfelvétel után levont (poszterior)  következtetésekkel dolgozik. |
+| Előzetes elvárások          | Nem utal előzetes tudásra, csak a mintavételezéskor keletkező mintára összpontosít. Az előzetes tudás tacit. | Bevezeti a prior elvárásokat, amelyek a kezdeti ismereteket és hozzáértést tükrözik. Explicit előzetes tudással dolgozik.                |
+| Paraméterek értelmezése     | A paraméterek fix értékek, amelyek ismeretlenek, de konstansok.                                | A paraméterek valószínűségi eloszlások formájában jelennek meg.  |
+| Bizonytalanság kezelése      | A bizonytalanságot konfidencia intervallumokkal fejezi ki, az intervallum végpontjai egyfajta kétpontú pontbecslés. A 95%-os konfidenciaintervallum azt jelenti, hogy az ismeretlen paraméter 95%-os valószínűséggel található meg a kiszámított tartományban.                                             | A paraméternek inherens bizonytalansága van, amit valószínűségi eloszlásos formájában feltételez. Így egy ilyen következtetés nem pontszerű, hanem eloszlást ad vissza. Ennek legsűrűbb intervalluma a 95%-os HDI.   |
+| Adatkövetelmény              | Gyakran nagy mintaméretet igényel, hogy az eredmények stabilak legyenek.                                  | Használható kis minta esetén is, mivel a prior tudás rásegít az adatokra. |       
+| Adatfeldolgozás              | Kész analitikusan levezetett képletek a számítógép előtti korból, normalitási, függetlenségi feltételekkel. Táblázatokra, statisztikusi tapasztalatra hivatkozik.                            | Egységes elméleti keretrendszert ajánl fel: előzetes tudás + aktuális adat -> aktuális tudás, számítógéppel számolja a következtetéseket. |                        |
+|  Jelenségek modellezése              | Mintavételzési eljárásokkal dolgozik.  | Igazodik a természettudományos, valódi kísérletekhez, ezeket formalizálja, explicitté teszi.    |               
+| Interpretáció               | Gyakran konfidencia intervallumokkal és hipotézisvizsgálatal dolgozik, amelyek értelmezése nehézkes, körmönfont.  | A valószínűségi értelmezés miatt könnyebb értelmezni a statisztikai eredményeket.                   |
