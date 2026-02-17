@@ -184,10 +184,17 @@ print((19+18+18)/3);
 
 | Kritérium | Frekventista statisztika | Bayesiánus statisztika |
 | :--- | :--- | :--- |
-| **Alapelvek** | Egyetlen feltételezett mintatérből vett tömeges minták alapján hoz döntést. | Az előzetes ismereteket és a friss adatokat ötvözve mutatja meg a lehetséges válaszok valószínűségét. |
-| **Előzetes elvárások** | Nem vesz figyelembe semmilyen előzetes tudást a vizsgálat tárgyáról. | A kezdeti szakmai ismereteket tudatosan beépíti a matematikai modellbe. |
+| **Alapelvek** | Egyetlen feltételezett matematikai mintatér alapján hoz döntést. | Az előzetes ismereteket és a friss adatokat ötvözve mutatja meg a lehetséges válaszok valószínűségét. |
+| **Előzetes elvárások** | Nem vesz figyelembe előzetes tudást a vizsgálat tárgyáról. | A kezdeti szakmai ismereteket tudatosan beépíti a matematikai modellbe. |
 | **Paraméterek értelmezése** | A keresett értékeket ismeretlen, de állandó fix számoknak tekinti. | A keresett értékeket természetes bizonytalansággal rendelkező eloszlásokként kezeli. |
 | **Bizonytalanság kezelése** | Nehezen értelmezhető intervallumokkal próbálja megbecsülni a tévedés esélyét. | Egy teljes és könnyen leolvasható valószínűségi térképet ad a lehetséges kimenetelekről. |
 | **Adatkövetelmény** | Megbízható eredmény eléréséhez nagyszámú mérési adatra van szüksége. | Az előzetes tudás felhasználása miatt akár néhány mérés is elegendő lehet a döntéshez. |
 | **Adatfeldolgozás** | Szigorú feltételekhez kötött, kész képletekbe helyettesíti be az adatokat. | Számítógépes szimuláció segítségével alkot egységes elméleti keretet a következtetéshez. |
 | **Interpretáció** | Csak elvetni tud egy feltételezést egy határérték alapján, megerősíteni nem. | Közvetlenül össze tudja mérni és rangsorolni a különböző magyarázó modellek valószínűségét. |
+
+
+## Útravaló
+
+1. Ha Csofiról (a hörcsögről) nem tudnátok semmit, csak ránéznétek a sziluettjére, és azt hinnétek, hogy egy kiselefánt, vajon hány darab 18 grammos mérés kellene ahhoz, hogy az agyatok elhiggye, hogy ez mégiscsak egy hörcsög?
+2. Gondoljatok egy mai, teljesen hétköznapi döntésetekre (pl. melyik úton jöjjek az egyetemre). Ha ezt le kéne programoznotok WebPPL-ben, mi lenne benne az előzetes tudás és menet közben változó operatív döntés?
+3. Ha a frekventista statisztika tényleg csak elvetni tud dolgokat, és egy önkényes 0.05-ös határra épül, akkor miért ezt használja a tudományos cikkek 90%-a? Miért kényelmesebb az emberi elmének egy szignifikáns / nem szignifikáns bináris döntés, mint a Bayes-féle inherens bizonytalanság elviselése?
