@@ -1,5 +1,12 @@
 # Bayes-féle megközelítés
 
+Van egy törpehörcsögünk, amelyikről azt gyanítjuk, hogy rendellenesen fogy. A súlya (tömege) elméletileg egy 22 g közepű 1 g-os szórású normál eloszlás (haranggörbe). El kéne dönteni, hogy orvoshoz kell-e vinni. 
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mozow01/Bayes2024/main/1_gyak/horcsi.jpeg" alt="Csofi" width="300"><br>
+  <b>Csofi</b>
+</p>
+
 Csofi súlya egy bizonytalan érték (inherensen bizonytalan). Két dolgot tudunk: $Gauss(22,1)$ egy egészséges állat súlya, $Gauss(17,1)$ egy betegé. Csofi a mérések alapján 19, 18, 18 g. Ez eléggé leszűkíti a lehetőségeket. 
 
 Ha felállítunk két modellt, a gép ki tudja számolni, melyik a valószínűbb!
