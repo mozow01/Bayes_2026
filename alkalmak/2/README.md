@@ -96,7 +96,7 @@ Tehát ez az intervallum jó a mérések 95%-ában, abban az értelemben, hogy t
 
 *Korrigált tapasztalati szórás* ($S$): Az átlagtól vett négyzetes eltérés per $n-1$ ($3-1=2=df$ degrees of freedom) négyzetgyöke. $S \approx 0.577 \text{ g}$
 
-*Standard hiba ($SE$):* $0.577 / \sqrt{3} \approx 0.333 \text{ g}$
+*Standard hiba* ($SE$): $0.577 / \sqrt{3} \approx 0.333 \text{ g}$
 
 *Kritikus $t$-érték:* 2 szabadságfoknál, egyoldali 95%-os szintre a táblázatból: $t_{0.05} = 2.92$ ( https://goodcalculators.com/student-t-value-calculator/ ) 
 
