@@ -82,4 +82,76 @@ print((19+18+18)/3);
 | **Adatfeldolgozás** | Szigorú feltételekhez kötött, kész, előre gyártott képletekbe helyettesíti be az adatokat. | Számítógépes szimuláció segítségével alkot egységes elméleti keretet a következtetéshez. |
 | **Interpretáció** | Csak elvetni tud egy feltételezést egy határérték alapján, megerősíteni nem. | Közvetlenül össze tudja mérni és rangsorolni tudja a különböző magyarázó modellek valószínűségét. |
 
-**Konfidencia intervallum:** egy adott paramétert mérő mintavételezési eljárás 95%-os konfidenciaintervalluma egy olyan, a mintából számolt tartomány, ami az esetek 95%-ában tartalmazza a valódi paramétert, ha a mintavételt végtelen sokszor megismételnénk.
+## Konfidencia intervallum és kredibilitási intervallum
+
+Most, hogy döntöttünk, hogy Csofi beteg vagy sem, a súlyára valamit kéne mondanunk. Nézzük a két megközelítést.
+
+### Konfidencia intervallum (frekventizmus)
+
+**Konfidencia intervallum:** egy adott paramétert mérő mintavételezési eljárás 95%-os konfidenciaintervalluma egy olyan, a mintából számított tartomány, ami az esetek 95%-ában tartalmazza a valódi paramétert, ha a mintavételt végtelen sokszor megismételnénk. 
+
+Tehát ez az intervallum jó a mérések 95%-ában, abban az értelemben, hogy tartalmazza Csofi fix súlyát.
+
+*Mintaátlag* ($\bar{x}$): $\frac{19 + 18 + 18}{3} = 18.33 \text{ g}$
+
+*Korrigált tapasztalati szórás* ($S$): Az átlagtól vett négyzetes eltérés per $n-1$ ($3-1=2=df$ degrees of freedom) négyzetgyöke. $S \approx 0.577 \text{ g}$
+
+*Standard hiba ($SE$):* $0.577 / \sqrt{3} \approx 0.333 \text{ g}$
+
+*Kritikus $t$-érték:* 2 szabadságfoknál, egyoldali 95%-os szintre a táblázatból: $t_{0.05} = 2.92$ ( https://goodcalculators.com/student-t-value-calculator/ ) 
+
+A felső korlát ($c$):
+$$c = \bar{x} + (t_{0.05} \times SE) = 18.33 + (2.92 \times 0.333) = 19.30 \text{ g}$$
+
+A 95%-os egyoldali intervallumunk tehát: $(-\infty \text{ ; } 19.30]$.
+
+Illetve még egy kör ugyanarra: a $H_0$-ban feltételezett 20 gramm ezen kívül esik, a nullhipotézist $\alpha=0.05$-ös szinten elvetjük.
+
+Ez egy úgy nevezett intervallumbecslés.
+
+### Kredibilitási intervallum
+
+A Bayesiánus episztemológiában a hörcsög súlya nem fix, hanem egy **eloszlás** reprezentálja. Sőt, van előzetes tudásunk: Csofi vagy egészséges (22 g körüli) vagy beteg (mondjuk 17 g körüli). Beépítjük az adatainkat (19, 18, 18) egy WebPPL modellbe:
+
+```javascript
+var model = function() {
+
+  // Beteg hörcsög (mu=17, sigma=1)
+  var súly = gaussian(17, 1);
+
+  // A mérés hibája (a mintából becsült bizonytalanság)
+  var SE = 0.577;
+
+  // A mért adatokkal ütköztetjük a modell előzetes információit
+  observe(Gaussian({mu: súly, sigma: 1}), 19);
+  observe(Gaussian({mu: súly, sigma: 1}), 18);
+  observe(Gaussian({mu: súly, sigma: 1}), 18);
+
+  return súly;
+}
+
+var prior_modell = function() {
+  return gaussian(17, 1);
+}
+
+// Generált előzetes beteg hörcsög súly
+var frissítettlen_modell = Infer({method: 'MCMC', samples: 10000}, prior_modell);
+
+// Generált amegfigyelt beteg hörcsög súly
+var frissített_modell = Infer({method: 'MCMC', samples: 10000}, model);
+
+viz.auto(frissítettlen_modell)
+
+viz.auto(frissített_modell)
+
+var also_hatar = 18.8;
+
+var hdi_valoszinuseg = expectation(frissített_modell, 
+                              function(x) { return x < also_hatar; });
+
+print(hdi_valoszinuseg);
+```
+
+Ebből az eloszlásból utólag kivágjuk a legsűrűbb 95%-ot, ezt hívjuk **HDI-nek (Highest Density Interval)**.
+
+**Kredibilitási intervallum (Credible interval):** Egy adott paraméter 95%-os kredibilitási intervalluma (HDI-je) egy olyan tartomány, amelybe a valódi paraméter – a rendelkezésre álló adatok és az előzetes tudásunk ismeretében – *ténylegesen 95%-os valószínűséggel esik*.
