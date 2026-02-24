@@ -35,7 +35,7 @@ var Model = function() {
   return {i: i};
 };
 
-// Inferencia (A számítógép ütközteti a mért adatokat és a priorral)
+// Inferencia (A számítógép ütközteti a mért adatokat a priorral)
 var opts = {method: 'SMC', particles: 3000, rejuvSteps: 5};
 var post = Infer(opts, Model);
 
