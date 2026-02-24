@@ -82,4 +82,4 @@ print((19+18+18)/3);
 | **Adatfeldolgozás** | Szigorú feltételekhez kötött, kész, előre gyártott képletekbe helyettesíti be az adatokat. | Számítógépes szimuláció segítségével alkot egységes elméleti keretet a következtetéshez. |
 | **Interpretáció** | Csak elvetni tud egy feltételezést egy határérték alapján, megerősíteni nem. | Közvetlenül össze tudja mérni és rangsorolni tudja a különböző magyarázó modellek valószínűségét. |
 
-
+**Konfidencia intervallum:** egy adott paramétert mérő mintavételezési eljárás 95%-os konfidenciaintervalluma egy olyan, a mintából számolt tartomány, ami az esetek 95%-ában tartalmazza a valódi paramétert, ha a mintavételt végtelen sokszor megismételnénk.
