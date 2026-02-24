@@ -155,3 +155,9 @@ print(hdi_valoszinuseg);
 Ebből az eloszlásból utólag kivágjuk a legsűrűbb 95%-ot, ezt hívjuk **HDI-nek (Highest Density Interval)**.
 
 **Kredibilitási intervallum (Credible interval):** Egy adott paraméter 95%-os kredibilitási intervalluma (HDI-je) egy olyan tartomány, amelybe a valódi paraméter – a rendelkezésre álló adatok és az előzetes tudásunk ismeretében – *ténylegesen 95%-os valószínűséggel esik*.
+
+## Útravaló
+
+Ha a hörcsög fizikai létéről van szó, az emberi elme frekventista: úgy érezzük, Csofinak van egy fix tömege, és abszurdnak tartjuk a gondolatot, hogy a súlya inherensen bizonytalan. Amikor viszont intervallumbecslést szeretnénk adni a súlyára, bayesiánussá válunk: azt a választ akarjuk hallani, hogy "95% esély van rá, hogy Csofi súlya 18 és 20 gramm közé esik" (kredibilitási intervallum), és nem azt, hogy a képzeletbeli végtelen ismétlések világában a mintavételezési módszernek mi a hibaaránya.
+
+Kérdés: feloldható-e ez a kognitív disszonancia azzal, hogy a Bayes-féle episztemológia nem az objektív fizikai valóságot teszi bizonytalanná, hanem a mi tudatlanságunkat és információhiányunkat fejezi ki? Ha az emberi agy egy Bayesiánus gép a mindennapi döntésekben, miért ragaszkodik a tudományos intézményrendszer 95%-a frekventista módszerhez?
