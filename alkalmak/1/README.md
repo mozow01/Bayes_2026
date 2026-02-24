@@ -94,11 +94,12 @@ Ezen a ponton feladjuk, és megkérdezzük a matematikust (Pearson, Gosset), hog
 A válasz a következő. 
 
 Eldöntötted-e, hogy:
-1.  hány mérést végzel?
-2.  mekkora valószínűséget gondolsz problémásnak? 
 
-1.  Igen, 3 mérés.
-2.  Mondjuk $\alpha = 0.05$ alatt már nagyon gyanús (szignifikancia szint).
+1. hány mérést végzel?
+2. mekkora valószínűséget gondolsz problémásnak? 
+
+1. Igen, 3 mérés.
+2. Mondjuk $\alpha = 0.05$ alatt már nagyon gyanús (szignifikancia szint).
 
 Akkor a fentiek alapján számold ki ezt a $t$-értéket (ahol 20 a vizsgált határ): 
 
