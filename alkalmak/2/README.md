@@ -74,12 +74,12 @@ print((19+18+18)/3);
 
 | Kritérium | Frekventista statisztika | Bayesiánus statisztika |
 | :--- | :--- | :--- |
-| **Alapelvek** | Egyetlen feltételezett matematikai mintatér alapján hoz döntést. | Az előzetes ismereteket és a friss adatokat ötvözve mutatja meg a lehetséges válaszok valószínűségét. |
+| **Alapelvek** | Egyetlen feltételezett matematikai mintatér alapján hoz döntést. | Az előzetes ismeretek és a mért adatokat ismeretében adja meg a modellek és lehetséges értékek valószínűségét. |
 | **Előzetes elvárások** | Nem vesz figyelembe előzetes tudást a vizsgálat tárgyáról. | A kezdeti szakmai ismereteket tudatosan beépíti a matematikai modellbe. |
-| **Paraméterek értelmezése** | A keresett értékeket ismeretlen, de állandó fix számoknak tekinti. | A keresett értékeket természetes bizonytalansággal rendelkező eloszlásokként kezeli. |
-| **Bizonytalanság kezelése** | Nehezen értelmezhető intervallumokkal próbálja megbecsülni a tévedés esélyét. | Egy teljes és könnyen leolvasható valószínűségi térképet ad a lehetséges kimenetelekről. |
+| **Paraméterek értelmezése** | A keresett értékeket ismeretlen, de fix számoknak tekinti. | A keresett értékeket természetes (inherens) bizonytalansággal rendelkező eloszlásoknak tekinti. |
+| **Bizonytalanság kezelése** | Intervallumokkal (konfidencia-) próbálja megbecsülni a tévedés esélyét. | Egy teljes és könnyen leolvasható valószínűségi térképet ad a lehetséges kimenetelekről (eloszlást ad vissza). |
 | **Adatkövetelmény** | Megbízható eredmény eléréséhez nagyszámú mérési adatra van szüksége. | Az előzetes tudás felhasználása miatt akár néhány mérés is elegendő lehet a döntéshez. |
-| **Adatfeldolgozás** | Szigorú feltételekhez kötött, kész képletekbe helyettesíti be az adatokat. | Számítógépes szimuláció segítségével alkot egységes elméleti keretet a következtetéshez. |
-| **Interpretáció** | Csak elvetni tud egy feltételezést egy határérték alapján, megerősíteni nem. | Közvetlenül össze tudja mérni és rangsorolni a különböző magyarázó modellek valószínűségét. |
+| **Adatfeldolgozás** | Szigorú feltételekhez kötött, kész, előre gyártott képletekbe helyettesíti be az adatokat. | Számítógépes szimuláció segítségével alkot egységes elméleti keretet a következtetéshez. |
+| **Interpretáció** | Csak elvetni tud egy feltételezést egy határérték alapján, megerősíteni nem. | Közvetlenül össze tudja mérni és rangsorolni tudja a különböző magyarázó modellek valószínűségét. |
 
 
