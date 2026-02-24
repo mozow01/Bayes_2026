@@ -35,7 +35,7 @@ var Model = function() {
   return {i: i};
 };
 
-// Inferencia (A számítógép "gondolkodik")
+// Inferencia (A számítógép ütközteti a mért adatokat és a priorral)
 var opts = {method: 'SMC', particles: 3000, rejuvSteps: 5};
 var post = Infer(opts, Model);
 
@@ -98,7 +98,7 @@ Tehát ez az intervallum jó a mérések 95%-ában, abban az értelemben, hogy t
 
 *Standard hiba* ($SE$): $0.577 / \sqrt{3} \approx 0.333 \text{ g}$
 
-*Kritikus $t$-érték:* 2 szabadságfoknál, egyoldali 95%-os szintre a táblázatból: $t_{0.05} = 2.92$ ( https://goodcalculators.com/student-t-value-calculator/ ) 
+*Kritikus* $t$ *-érték:* 2 szabadságfoknál, egyoldali 95%-os szintre a táblázatból: $t_{0.05} = 2.92$ ( https://goodcalculators.com/student-t-value-calculator/ ) 
 
 A felső korlát ($c$):
 $$c = \bar{x} + (t_{0.05} \times SE) = 18.33 + (2.92 \times 0.333) = 19.30 \text{ g}$$
