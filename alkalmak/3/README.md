@@ -219,6 +219,12 @@ viz.auto(Enumerate(model2));
 // Látható: X értéke már nem is vehet fel 0-t!
 ````
 
+## Útravaló
+
+Láttuk, hogy ugyanazt a valószínűségi eloszlást a klasszikus matematika és a számítógépes modellezés is szolgáltatni tudja. Az elméleti matematika egy elegáns elmélettel le tudja írni a világot, amely azonban elrejti az odavezető utat. A generatív modell vak a nagy egészre, de apró lépésekben megteremti a szimulációt.
+
+Melyik jelenti a mélyebb megértését? Ha találunk egy elegáns elméletet, vagy az, ha képesek vagyunk megírni azt az algoritmust, ami legenerálja a valóség egy modelljét? Melyik megkeresése a tudomány feladata?
+
 
 ### Gyakorló Feladatok
 1.  **Hipergeometrikus eloszlás:** 52 lapos francia kártyából húzunk 5 lapot (visszatevés nélkül). Mi annak a valószínűsége, hogy a) lesz benne pontosan egy treff, b) legalább egy király?
