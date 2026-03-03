@@ -2,7 +2,7 @@
 
 **A fő kérdésünk:** Hogyan fordíthatjuk le a középiskolából ismert "kombinatorikai okoskodást" számítógépes, generatív modellekké? 
 
-## 1. Kockadobás: A véletlen, mint függvény
+## 1. Kockadobás: a véletlen, mint függvény
 
 <img src="https://github.com/mozow01/cog_compsci/blob/main/SciCamp/1200px-2-Dice-Icon.svg.png" width="100">
 
