@@ -170,16 +170,16 @@ viz.hist(Enumerate(kedvezo_kartya));
 
 Változtassunk a játékszabályon: Húzzunk 3 lapot, de **visszatevéssel**! Keressük meg, hogy hány kőr lesz a 3 lapból (X változó). A siker (kőr húzása) esélye folyamatosan $p = 0.25$. 
 
-### A középiskolai út: Képletek és fák
+### A középiskolai út: képletek és fák
 Felrajzolunk egy fát. Hány úton érhetünk el mondjuk $k$ sikert $n$ próbából?
 
 Ebből születik a klasszikus képlet:
 $$P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}$$
 
-### A számítógépes út: Generatív építkezés
+### A számítógépes út: generatív építkezés
 A képlet felelevenítése helyett szimuláljuk a folyamatot elemi lépésekből! A `flip(p)` az elemi "Bernoulli-kísérlet", ami $p$ eséllyel ad 1-et (sikert), egyébként 0-t (kudarcot).
 
-**A lift analógia:** 3 manager utazik a liftbe,. $p=0.25$ az esélye, hogy egy embernek megcsörren a telója. Ha egy managernek megszólal a telőja, fel is veszi mindig. Az $X$ változó eloszlása megmutatja az esélyét annak, hogy 0, 1, 2 vagy 3 ember produkálja ezt a nem várt dolgot.
+**A lift analógia:** 3 menedzser utazik a liftben. $p=0.25$ az esélye, hogy egy embernek megcsörren a telója. Ha egy menedzsernek megszólal a telója, fel is veszi mindig. Az $X$ változó eloszlása megmutatja az esélyét annak, hogy 0, 1, 2 vagy 3 ember produkálja ezt a nem várt dolgot.
 
 ````javascript
 // Generatív építkezés (binomiális eloszlás géppel)
