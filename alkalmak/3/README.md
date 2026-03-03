@@ -10,7 +10,7 @@ Hagyományosan a kockadobás egy fizikai kísérlet. A WebPPL-ben ezt egy **füg
 
 **A WebPPL modell fontos kucsszavai:**
 * `var ... = ...`: Így definiálunk egy értéket vagy függvényt.
-* **Üres zárójelek `()`:** A `dobas()` függvénynek nincs bemenete, mert az eredményt a beépített *véletlengenerátor* adja.
+* **üres zárójelek `()`:** A `dobas()` függvénynek nincs bemenete, mert az eredményt a beépített *véletlengenerátor* adja.
 * **`categorical` eloszlás:** Megmondja, hogy mik a lehetséges értékek (`vs`), és ezek milyen valószínűséggel (`ps`) fordulnak elő.
 
 **Eredmények megjelenítése:**
