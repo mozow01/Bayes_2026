@@ -45,13 +45,15 @@ viz.auto(output);
 
 **Feladat:** Mi annak a valószínűsége, hogy két kockával dobva *legalább az egyik hatos*?
 
-### A középiskolai út: Kombinatorikai okoskodás
+### A középiskolai út: kombinatorikai okoskodás
 * **Összes eset (Eseménytér):** $6 \cdot 6 = 36$ lehetséges rendezett pár (▢ ▢).
 * **Kedvező esetek:** Azok a párok, ahol van hatos: (6, ▢) vagy (▢, 6). Ez összesen 11 darab eset.
 * **Eredmény:** $P = \frac{11}{36}$
 
-### A számítógépes út: Generatív modellépítés
+### A számítógépes út: generatív modellépítés
 Ahelyett, hogy mi számolnánk, **lefejtjük** az eseteket szimulációval a `condition()` parancs segítségével.
+
+<img src="https://github.com/mozow01/cog_compsci/blob/main/SciCamp/277680373_341339591289591_2928453617509407729_n.jpg" width="200">
 
 * `||`: VAGY operátor.
 * `&&`: ÉS operátor.
@@ -87,8 +89,6 @@ print("Szimulált p = " + Math.exp((összes.score)([6,6]))/Math.exp((kedvező.sc
 ### Hogyan számol a háttérben az `Infer`?
 1.  **`Enumerate`:** Végignézi az *összes* lehetséges matematikai ágat (egzakt).
 2.  **`forward` sampling:** `Infer({method: 'forward', samples: 10000, model: dobás})` – Lefuttatja a kódot 10000-szer, és a gyakoriságokból csinál eloszlást.
-
-<img src="https://github.com/mozow01/cog_compsci/blob/main/SciCamp/277680373_341339591289591_2928453617509407729_n.jpg" width="200">
 
 ## 3. Golyók elosztása
 
@@ -128,6 +128,8 @@ viz.hist(Enumerate(lerakas2));
 ````
 
 ## 4. Kártyahúzás (függő események modellezése)
+
+<img src="https://github.com/mozow01/cog_compsci/blob/main/SciCamp/png-transparent-blackjack-texas-hold-em-three-card-poker-playing-card-card-miscellaneous-game-angle-thumbnail.png" width=100>
 
 **Feladat:** 52 lapból húzunk 2-t visszatevés nélkül. Mi az esélye a kőr királynak?
 
