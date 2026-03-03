@@ -93,10 +93,13 @@ print("Szimulált p = " + Math.exp((összes.score)([6,6]))/Math.exp((kedvező.sc
 ## 3. Golyók elosztása
 
 **Feladat:** Lerakunk 5 helyre 2 golyót, egy helyen csak 1 golyó lehet. 
+
 a) Mindkét golyó az első 3 helyen van?
+
 b) Valamelyik az utolsó 2 helyen van?
 
 ○ ○ ○ ○ ○
+
 ○ ○ ● ● ○
 
 **Modellépítési stratégiák (kétféle reprezentáció):**
