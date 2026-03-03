@@ -226,7 +226,7 @@ Láttuk, hogy ugyanazt a valószínűségi eloszlást a klasszikus matematika é
 Melyik jelenti a mélyebb megértését? Ha találunk egy elegáns elméletet, vagy az, ha képesek vagyunk megírni azt az algoritmust, ami legenerálja a valóség egy modelljét? Melyik megkeresése a tudomány feladata?
 
 
-### Gyakorló Feladatok
+### Szorgalmi feladatok
 1.  **Hipergeometrikus eloszlás:** 52 lapos francia kártyából húzunk 5 lapot (visszatevés nélkül). Mi annak a valószínűsége, hogy a) lesz benne pontosan egy treff, b) legalább egy király?
 2.  **Kompetenciamérés:** Egy iskolában 1000 gyerek tanul, a mérésen mindig ugyanaz a 10 gyerek lesz rosszul. A termekbe sorsolják a diákokat. Mi annak a valószínűsége, hogy a Földszint VI-ban lévő 20 diákból legfeljebb 3 lesz rosszul?
 3.  **Érettségi:** Sokéves átlagban p = 0.02 valószínűséggel lesz egy érettségiző az írásbelin rosszul. Mi annak a valószínűsége, hogy a 30 fős 12. C. osztályában legfeljebb 1 ember lesz rosszul?
