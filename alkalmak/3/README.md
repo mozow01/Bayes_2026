@@ -8,7 +8,7 @@
 
 Hagyományosan a kockadobás egy fizikai kísérlet. A WebPPL-ben ezt egy **függvénnyel** helyettesítjük.
 
-**A WebPPL modell anatómiája:**
+**A WebPPL modell fontos kucsszavai:**
 * `var ... = ...`: Így definiálunk egy értéket vagy függvényt.
 * **Üres zárójelek `()`:** A `dobas()` függvénynek nincs bemenete, mert az eredményt a beépített *véletlengenerátor* adja.
 * **`categorical` eloszlás:** Megmondja, hogy mik a lehetséges értékek (`vs`), és ezek milyen valószínűséggel (`ps`) fordulnak elő.
@@ -21,7 +21,7 @@ Hagyományosan a kockadobás egy fizikai kísérlet. A WebPPL-ben ezt egy **füg
 **Hasznos linkek:** Vizualizáció: http://probmods.github.io/webppl-viz/
 
 ````javascript
-// Generatív modell: Két kocka dobása
+// Generatív modell: két kocka dobása
 var dobás = function () {
   var kocka1 = categorical({ps: [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], vs: [1, 2, 3, 4, 5, 6]});
   var kocka2 = categorical({ps: [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], vs: [1, 2, 3, 4, 5, 6]});
@@ -29,7 +29,7 @@ var dobás = function () {
   return { kockapár: [kocka1, kocka2] };
 }
 
-// Futassuk le 10-szer!
+// Futassuk 10-szer!
 var sokdobás = repeat(10, dobás); 
 viz.auto(sokdobás);
 
@@ -39,7 +39,7 @@ viz.auto(output);
 ````
 
 
-## 2. Kockadobás feltételekkel (Kedvező esetek)
+## 2. Kockadobás feltételekkel (kedvező esetek)
 
 <img src="https://github.com/mozow01/cog_compsci/blob/main/SciCamp/2381778-200.png" width="100">
 
@@ -51,12 +51,14 @@ viz.auto(output);
 * **Eredmény:** $P = \frac{11}{36}$
 
 ### A számítógépes út: Generatív modellépítés
-Ahelyett, hogy mi számolnánk, **leszűrjük** a szimulációt a `condition()` paranccsal!
+Ahelyett, hogy mi számolnánk, **lefejtjük** az eseteket szimulációval a `condition()` parancs segítségével.
 
 * `||`: VAGY operátor.
 * `&&`: ÉS operátor.
-* `==`: Értékazonosság vizsgálata.
-* `condition(kocka1 == 6 || kocka2 == 6)`: A gép eldobja azokat a kísérleteket, amik nem felelnek meg ennek a feltételnek.
+* `!`: NEM operátor.
+* `==`: értékazonosság vizsgálata.
+
+`condition(kocka1 == 6 || kocka2 == 6)`: A gép eldobja azokat a kísérleteket, amik nem felelnek meg ennek a feltételnek.
 
 ````javascript
 var dobás = function () {
@@ -69,7 +71,7 @@ var kedvező_dobás = function () {
   var kocka1 = randomInteger(6) + 1;
   var kocka2 = randomInteger(6) + 1;
   
-  // A MODELL LELKE: A feltétel megadása
+  // A MODELL SZŰRŐJE: a feltétel megadása
   condition((kocka1 == 6 || kocka2 == 6));
   
   return [kocka1, kocka2];
@@ -84,10 +86,9 @@ print("Szimulált p = " + Math.exp((összes.score)([6,6]))/Math.exp((kedvező.sc
 
 ### Hogyan számol a háttérben az `Infer`?
 1.  **`Enumerate`:** Végignézi az *összes* lehetséges matematikai ágat (egzakt).
-2.  **`forward` sampling:** `Infer({method: 'forward', samples: 10000, model: dobás})` – Lefuttatja a kódot 10000-szer, és a gyakoriságokból csinál eloszlást. (Valahol a Stanfordon égetjük a szervereket. Fizessenek a gazdagok!)
+2.  **`forward` sampling:** `Infer({method: 'forward', samples: 10000, model: dobás})` – Lefuttatja a kódot 10000-szer, és a gyakoriságokból csinál eloszlást.
 
 <img src="https://github.com/mozow01/cog_compsci/blob/main/SciCamp/277680373_341339591289591_2928453617509407729_n.jpg" width="200">
-
 
 ## 3. Golyók elosztása
 
@@ -98,9 +99,9 @@ b) Valamelyik az utolsó 2 helyen van?
 ○ ○ ○ ○ ○
 ○ ○ ● ● ○
 
-**Modellépítési stratégiák (Kétféle reprezentáció):**
-1.  **Helyek szerint:** Kiválasztunk két koordinátát (1-5), kikötve, hogy nem lehetnek egyenlőek.
-2.  **Állapotok szerint:** Minden hely egy változó (0 vagy 1), kikötve, hogy az összegük pontosan 2.
+**Modellépítési stratégiák (kétféle reprezentáció):**
+1.  **Helyek szerint:** Kiválasztunk két helyet (1-5), kikötve, hogy nem lehetnek egyenlőek.
+2.  **Állapotok szerint:** Minden helyhez egy 0-1 érték tartozik, azzal a globális megszorítással, hogy az összegük pontosan 2 legyen.
 
 ````javascript
 // 1. Modell: Hová tesszük a golyókat?
@@ -126,22 +127,7 @@ viz.hist(Enumerate(lerakas1));
 viz.hist(Enumerate(lerakas2));
 ````
 
-
-## 4. Elméleti kitekintő: Kolmogorov-axiómák és Szabályok
-
-*(Gyors ismétlés)*
-Az (Ω, Σ, P) valószínűségi mező alapszabályai:
-1.  **Nemnegativitás:** P(A) ≧ 0
-2.  **Biztosság:** P(Ω) = 1, P(∅) = 0
-3.  **Additivitás (kizáró eseményeknél):** Ha A ⋂ B = ∅, akkor P(A ⋃ B) = P(A) + P(B).
-
-**Kulcsfontosságú eszközök a modellezéshez:**
-* **Komplementer:** P(comp(A)) = 1 - P(A)
-* **Függetlenség:** P(A ⋂ B) = P(A) ⋅ P(B)
-* **Logikai szita:** P(A+B) = P(A) + P(B) - P(A \cdot B)
-
-
-## 5. Kártyahúzás (Függő események modellezése)
+## 4. Kártyahúzás (függő események modellezése)
 
 **Feladat:** 52 lapból húzunk 2-t visszatevés nélkül. Mi az esélye a kőr királynak?
 
@@ -150,8 +136,8 @@ Rendezetlen modell:
 Összes eset: $\binom{52}{2}$
 Kedvező esetek: $\binom{1}{1} \cdot \binom{51}{1}$
 
-### A számítógépes út (Joint / Többváltozós eloszlás)
-A két húzás (*X* és *Y* változók) **összefüggenek**, hiszen a kihúzott lap eltűnik a pakliból. A gép ezt a függőséget egy táblázattal (joint eloszlás) és a feltételkezeléssel oldja fel:
+### A számítógépes út (joint / többváltozós eloszlás)
+A két húzás (*X* és *Y* Boole-változók) **összefüggenek**, hiszen a kihúzott lap eltűnik a pakliból. A gép ezt a függőséget egy táblázattal (joint eloszlás) és a feltételkezeléssel oldja fel:
 
 ````javascript
 var kedvezo_kartya = function () {
@@ -175,8 +161,7 @@ var kedvezo_kartya = function () {
 viz.hist(Enumerate(kedvezo_kartya));
 ````
 
-
-## 6. A fő attrakció: A Binomiális Eloszlás felépítése
+## 5. A binomiális eloszlás felépítése
 
 Változtassunk a játékszabályon: Húzzunk 3 lapot, de **visszatevéssel**! Keressük meg, hogy hány kőr lesz a 3 lapból (X változó). A siker (kőr húzása) esélye folyamatosan $p = 0.25$. 
 
@@ -187,30 +172,30 @@ Ebből születik a klasszikus képlet:
 $$P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}$$
 
 ### A számítógépes út: Generatív építkezés
-A képlet bemagolása helyett szimuláljuk a folyamatot elemi lépésekből! A `flip(p)` az elemi "Bernoulli-kísérlet", ami $p$ eséllyel ad 1-et (sikert).
+A képlet felelevenítése helyett szimuláljuk a folyamatot elemi lépésekből! A `flip(p)` az elemi "Bernoulli-kísérlet", ami $p$ eséllyel ad 1-et (sikert), egyébként 0-t (kudarcot).
 
-**A "liftes" analógia:** 3 ember utazik a liftben. $p=0.25$ az esélye, hogy egy ember "elszellenti" magát. Az $X$ változó eloszlása megmutatja az esélyét annak, hogy 0, 1, 2 vagy 3 ember teszi meg ezt a méltatlan dolgot.
+**A lift analógia:** 3 manager utazik a liftbe,. $p=0.25$ az esélye, hogy egy embernek megcsörren a telója. Ha egy managernek megszólal a telőja, fel is veszi mindig. Az $X$ változó eloszlása megmutatja az esélyét annak, hogy 0, 1, 2 vagy 3 ember produkálja ezt a nem várt dolgot.
 
 ````javascript
-// Generatív építkezés (Manuális binomiális eloszlás)
+// Generatív építkezés (binomiális eloszlás géppel)
 var model = function() {
-  var H1 = flip(0.25); // Első ember
-  var H2 = flip(0.25); // Második ember
-  var H3 = flip(0.25); // Harmadik ember
+  var H1 = flip(0.25); // első ember
+  var H2 = flip(0.25); // második ember
+  var H3 = flip(0.25); // harmadik ember
   
-  var X = H1 + H2 + H3; // Összes eset
+  var X = H1 + H2 + H3; // összes eset
   return {'X': X};
 }
 
-// Mivel ez ennyire gyakori felépítés, van rá beépített, kész objektum is:
+// Mivel ez gyakori felépítés, persze van rá beépített, kész függvény is:
 var binom = Binomial({p: 0.25, n: 3});
 
 viz.auto(Enumerate(model));
 viz.auto(binom); // A kettő grafikonja hajszálpontosan ugyanaz!
 ````
 
-### A generatív modell igazi ereje: Azonnali alkalmazkodás
-Mi történik a képlettel, ha bejön egy extra információ? Pl.: "Tudjuk, hogy az első húzás kőr volt" (vagy az első ember biztosan bűnös a liftben). A képletet újra kéne gondolni. A modellben viszont csak beszúrunk egy `condition`-t!
+### A generatív modell igazi haszna: instant alkalmazkodás
+Mi történik a formulákkal és az okoskodással, ha hozzájutunk egy extra információhoz? Pl.: "Tudjuk, hogy az első húzás kőr volt". A képletet újra kéne gondolni. A modellben viszont csak beszúrunk egy `condition`-t!
 
 ````javascript
 var model2 = function() {
@@ -228,7 +213,6 @@ var model2 = function() {
 viz.auto(Enumerate(model2)); 
 // Látható: X értéke már nem is vehet fel 0-t!
 ````
-
 
 
 ### Gyakorló Feladatok
