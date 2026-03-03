@@ -1,4 +1,4 @@
-# Kombinatorikai és valószínűségi kísérletek modellezése
+# Kombinatorikai kísérletek modellezése
 
 **A fő kérdésünk:** Hogyan fordíthatjuk le a középiskolából ismert "kombinatorikai okoskodást" számítógépes, generatív modellekké? 
 
