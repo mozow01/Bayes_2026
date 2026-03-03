@@ -46,7 +46,7 @@ viz.auto(output);
 **Feladat:** Mi annak a valószínűsége, hogy két kockával dobva *legalább az egyik hatos*?
 
 ### A középiskolai út: kombinatorikai okoskodás
-* **Összes eset (Eseménytér):** $6 \cdot 6 = 36$ lehetséges rendezett pár (▢ ▢).
+* **Összes eset (eseménytér):** $6 \cdot 6 = 36$ lehetséges rendezett pár (▢ ▢).
 * **Kedvező esetek:** Azok a párok, ahol van hatos: (6, ▢) vagy (▢, 6). Ez összesen 11 darab eset.
 * **Eredmény:** $P = \frac{11}{36}$
 
