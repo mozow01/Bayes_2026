@@ -1,6 +1,6 @@
-# Feltételes valószínűség és inferálás
+# Eloszlások modellezése
 
-## Kártyahúzás visszatevéssel (binomiális eloszlás)
+## Ismétlés: kártyahúzás visszatevéssel (binomiális eloszlás)
 
 Egy 52 lapos francia kártyapakliban annak a valószínűsége, hogy egy kártya kőr (♥): p = 13/52 = 0.25. Keressük annak az X valószínűségi változónak az eloszlását, ami azt mondja meg, hogy ha _visszatevéssel_ kiveszünk a pakliból 3 lapot, akkor hány ebből a kőr, tehát
 
@@ -71,162 +71,103 @@ Tehát van egy _p_ valószínűségű Boole-változó (Bernoulli-változó) és 
 
 A képlet magyarázata röviden a következő. Ha pontosan tudnánk, hogy az $n$ hosszú kísérletsorozatból az első $k$-ban teljesül ($p$ valószínűséggel) a vizsgált tulajdonság, a többiben nem, akkor ennek a sorozatban a valószínűsége: $p^k(1-p)^{n-k}$, hiszen az elemi kimenetelek függetlenek és a komplementer esemény valószínűsége $1-p$, amiből $n-k$ van. No, most már képzeljünk el $n$ helyet egymás mellett, amelyekre az igaz szót tesszük le. Amikor az a kérdés, hogy $k$ igazat hányféleképpen tudunk erre az $n$ helyre letenni, akkor a válasz $\binom{n}{k}$. Mindegyik elrendezés megfelel a $k$ db igaz feltételnek, továbbá az ilyen lerakások kölcsönösen kizárják egymást, ezért ezeket csak össze kell adni, ezt megteszi az n-alatt a k szorzó. 
 
-## Függő változók, feltételes valószínűség, 
+## Kudarcorientált sikervadászat: negatív binomiális eloszlás 
 
-Valószínűségi változók függhetnek egymástól.
+Józsit, a Blaha Lujza téri aluljáró életművésze és egy nagyon speciális küldetése van: pontosan 3 szál cigit akar tarhálni az arra járóktól, hogy utána nyugodtan visszavonulhasson a haverokhoz a pékség elé. Józsi stratégiája. Minden szembejövőt leszólít: "Ne haragudjon, hogy megszólítom! Egy szál cigit tudna-e adni? Buszjegyre kell." Minden leszólítás egy független statisztikai kísérlet.
 
-**Példák** 
+* **"Siker" (p)** : a kiszemelt megáll, sóhajt egyet, és ad egy szál cigit. Mivel Pesten rohanunk, ennek a valószínűsége elég kicsi (p=0.05).
 
-Pesten annak a valószínűsége, hogy március 20-adikán esik: 1/3. Ha esik, akkor 50%-os valószínűséggel dugul be a város. Ha nem esik, akkor a dugó kialakulásának aránya 0,25.   
+* **"Kudarc" (k)**: a járókelő leszegett fejjel felgyorsít, a távolba bámul, vagy bedobja a "Jaj, jön a 4-es!" védekezést.
 
-**a)** Mi annak a valószínűsége, hogy közlekedési torlódás alakul ki?
+* **Cél (r)**: Józsinak pontosan r=3 sikerre (cigire) van szüksége.
 
-Legyen R az az igaz/hamis értékű kategorikus változó, hogy esik. Ekkor 
+(Egyéb példa: tinder 3 randi, álláskeresés 3 visszajelzés.) Megjegyzés az elnevezésre: a siker száma kőbe van  vésve (r=3), de a próbálkozások/kudarcok száma a végtelenbe nyúlhat, próbára téve Józsi tűrőképességét.
 
-[![\\ R\sim categorical(1/3,2/3)](https://latex.codecogs.com/svg.latex?%5C%5C%20R%5Csim%20categorical(1%2F3%2C2%2F3))](#_)
+### Algoritmikus modellezés
 
-vagyis ez nem függ semmitől. A dugó T változója viszont feltételesen van megadva: $T\sim$
+Keressük annak az X valószínűségi változónak az eloszlását, ami azt mondja meg, hogy ha visszatevéssel addig húzunk, amíg meg nem kapjuk a 3. feature-t, akkor addig hány negatív kimenetelt kapunk. Tehát amit visszaad a negatív esetek száma:
 
-$$categorial(0.5,0.5) \quad R=true $$
-$$categorial(0.25,0.75) \quad R=false$$
+X := „nem-feature-ök száma a 3. feature előtt, visszatevésesen”
 
 ````javascript
-var model6 = function () {
-    var R = flip(1/3)
-    var T = R==true ? flip(1/2) : flip(1/4)
-    return  [R,T] }
+var negBinFailures = function(r, p) {
+  var loop = function(successes, failures) {
+    if (successes === r) {
+      return failures;
+    } else {
+      var s = flip(p);
+      return loop(
+        successes + (s ? 1 : 0),
+        failures + (s ? 0 : 1)
+      );
+    }
+  };
+  return loop(0, 0);
+};
+
+var model = function() {
+  return negBinFailures(3, 0.25);
+};
+
+var eloszlas = Infer({
+  method: 'forward',
+  samples: 10000,
+  model: model
+});
+
+viz.auto(eloszlas);
+````
+
+A **forward sampling** sokszor lefuttatja a programot, és megnézi, milyen értékeket ad vissza. Aztán megszámolja, melyik érték hányszor jött ki. Ebből lesz az eloszlás közelítése. Ez egy **Monte Carlo módszer** és nem is nagyon lehet Enumerate-tel, mert végtelen ciklusba kerülne az algoritmus.
+
+### Elméletben egy $X$ negatív binomiális változó eloszlása ###
+
+Ha $X$ azt jelenti, hogy **hány kudarc történik az $r$-edik siker előtt**, és egyetlen kísérletben a siker valószínűsége $p$, akkor
+
+$$
+\Pr(X = k) = \binom{k+r-1}{k}(1-p)^k p^r,
+\qquad k=0,1,2,\dots
+$$
+
+A negatív binomiális eloszlás szokásos paraméterezése: az $r$ rögzített, a próbákat egymástól **függetlenül** ismételjük, és azt nézzük, hány kudarc ($k$) gyűlik össze, mire megérkezik az $r$-edik siker.
+
+A számítás. Tudjuk, hogy az utolsó eset siker. Egy ilyen konkrét sorozat valószínűsége
+
+$$(1-p)^k p^{r-1}$$
+
+Az első $k+r-1$ helyen a $k$ kudarcot $\binom{k+r-1}{k}$ féleképpen lehet elrendezni. Az egymást kölcsönösen kizáró lehetőségeket összeadva kapjuk a fenti összefüggést.
+
+### Picit érdekesebb kérdés
+
+Mi az eloszlása az első kísérletnek, ha tudjuk, hogy mennyi lett a kudarcok száma. A legelső ember, akit Józsi aznap reggel leszólított, adott-e neki cigit (1) vagy elhajtotta (0)?
+
+````javascript
+var model2 = function() {
+  var H1 = flip(0.25) ? 1 : 0;
+
+  var loop = function(successes, failures) {
+    if (successes === 3) {
+      return failures;
+    } else {
+      var H = flip(0.25) ? 1 : 0;
+      return loop(successes + H, failures + (1 - H));
+    }
+  };
+
+  var X = (H1 == 1) ? loop(1, 0) : loop(0, 1);
+  condition(X == 1);
+
+  return {'H1': H1}
 }
 
-var Z = Infer({method: 'enumerate', model: model6})
+var eloszlás2 = Infer({
+  method: 'rejection',
+  samples: 5000,
+  model: model2
+});
 
-viz(Z)
+viz.auto(eloszlás2);
 ````
-
-ill. 
-
-````javascript
-var model6 = function () {
-    var R = categorical({ps: [1/3,2/3], vs: ['esik', 'nem esik']})
-    var T = ( (R == 'esik') ? categorical({ps: [1/2,1/2], vs: ['dugó', 'nincs dugó']}) : 
-                       categorical({ps: [1/4,3/4], vs: ['dugó', 'nincs dugó']}) )
-    return  T }
-````
-
-**b)** Tudjuk, hogy annak a valószínűsége, hogy késem, 1/2 ha nincs dugó, ha viszont dugó van, akkor 90%. Mennyi a késésem eloszlása? 
-
-
-## A feltételes valószínűség definíciója
-
-Leszűkítjük az elemi események terét a feltételre, a B eseményt teljesítő elemi részeseményekre, azaz innentől nem Ω, hanem B az összes elemi események tere:
-
-[![\\ \Pr(A\mid B)=\frac{\Pr (A\cdot B)}{\Pr B},\quad \Pr B\ne 0  \\ ](https://latex.codecogs.com/svg.latex?%5C%5C%20%5CPr(A%5Cmid%20B)%3D%5Cfrac%7B%5CPr%20(A%5Ccdot%20B)%7D%7B%5CPr%20B%7D%2C%5Cquad%20%5CPr%20B%5Cne%200%20%20%5C%5C%20)](#_)
-
-Itt A és B események, azaz halmazok vagy állítások és nem változók. 
-
-**Szorzatszabály.** A feltételes valószínűség sokszor olyan intuitív, hogy azonnal ennek az értékét tudjuk, sőt, vannak olyan tárgyalások is (Rényi), amelyekben a feltételes valószínűség az alapfogalom. Éppen ezért a definíciót néha így írják:
-
-$$\Pr(A\mid B)\cdot  \Pr(B)=\Pr(A\cdot B)$$
-
-**Változókkal**
-
-Ha adott az X és Y változó és annak valamely x és y értéke, akkor az írásmód:
-
-[![\\ \Pr(X=x\mid Y=y)=\frac{\Pr (X=x\wedge Y=y)}{\Pr (Y=y)},\quad \Pr (Y=y)\ne 0 ](https://latex.codecogs.com/svg.latex?%5C%5C%20%5CPr(X%3Dx%5Cmid%20Y%3Dy)%3D%5Cfrac%7B%5CPr%20(X%3Dx%5Cwedge%20Y%3Dy)%7D%7B%5CPr%20(Y%3Dy)%7D%2C%5Cquad%20%5CPr%20(Y%3Dy)%5Cne%200%20)](#_)
-vagy
-
-[![\\ \Pr(X=x\mid Y=y)\cdot\Pr (Y=y)=\Pr (X=x\wedge Y=y)](https://latex.codecogs.com/svg.latex?%5C%5C%20%5CPr(X%3Dx%5Cmid%20Y%3Dy)%5Ccdot%5CPr%20(Y%3Dy)%3D%5CPr%20(X%3Dx%5Cwedge%20Y%3Dy))](#_)
-
-az együttes vagy joint vagy többváltozós valószínűség _felbontását_ szorzatra **faktorizációnak** nevezzük. A faktorizáció feltételes valószínűségekkel a függőségi viszonyokat jeleníti meg.  
-
-**Megjegyzés.** Vegyük észre, hogy a P (X | Y = y<sub>j</sub> ) = P( X = x<sub>i</sub> | Y = y<sub>j</sub> ) rögzített y<sub>j</sub>-re szintén az **X változó** egy valószínűségi eloszlása (pl. egyre összegződik: 
-
-Mindez Y-ra nem igaz: az Y értékben változó P(X = x<sub>i</sub> | Y ) kifejezés csak egy egyszerű függvény, pl. nem feltétlenül összegződik 1-re.
-
-**Példa**
-
-X = pénzérmével fej vagy írás (boole (1|0) értékű változó (0.5, 0.5) kategorikus eloszással)
-
-Y | X = királyt húzása (1|0) magyar kártyából, ha X = 1, és francia kártyából, ha X = 0.
-
-|      |  X=1   | X=0 |  
-| ---  | --- | --- | 
-|  Y=1, ha X = ... |  1/8 | 1/13 | 
-|  Y=0, ha X = ... | 7/8 | 12/13  | 
-
-**Megjegyzés.** Világos, hogy ez a táblázat NEM valószínűségi változó eloszlása. CSAK X rögzítésével lesz "igazi" eloszlás. A mögöttes eloszlás Y, azaz a "király húzása" csak közvetetten tudható. 
-
-(Feltételes: leszűkítjük az elemi események terét a feltételre, az A eseményt teljesítő elemi részeseményekre, azaz innentől nem Ω, hanem A az összes elemi események tere.)
-
-"Awkward" jelölés:
-
-[![\\ \Pr(Y\mid X)=\frac{\Pr (Y\cdot X)}{\Pr (X)},\quad \Pr (X)\ne 0](https://latex.codecogs.com/svg.latex?%5C%5C%20%5CPr(Y%5Cmid%20X)%3D%5Cfrac%7B%5CPr%20(Y%5Ccdot%20X)%7D%7B%5CPr%20(X)%7D%2C%5Cquad%20%5CPr%20(X)%5Cne%200)](#_)
-
-... és amit jelent valójában: rögzített x1,x2,... y1,y2,... elemi kimenetelekkel:
-
-[![\\ \Pr(Y=y_j\mid X=x_i)=\frac{\Pr (Y=y_j\;\&\; X=x_i)}{\Pr (X=x_i)},\quad \Pr (X=x_i)\ne 0](https://latex.codecogs.com/svg.latex?%5C%5C%20%5CPr(Y%3Dy_j%5Cmid%20X%3Dx_i)%3D%5Cfrac%7B%5CPr%20(Y%3Dy_j%5C%3B%5C%26%5C%3B%20X%3Dx_i)%7D%7B%5CPr%20(X%3Dx_i)%7D%2C%5Cquad%20%5CPr%20(X%3Dx_i)%5Cne%200)](#_)
-
-P(Y|X) -t úgy mondjuk ki, hogy Y valószínűsége feltéve, hogy X adott (probability of Y given X).
-
-````javascript
-var model5 = function () {
-    var X = flip()
-    var Y = flip( X ? 1/8 : 1/13)
-    
-    // condition (Y==1);
-    // return  {'X,Y': [X , Y]}
-    return  {'X' : X}
-}
-
-var Z = Infer({method: 'enumerate', model: model5})
-
-viz.table(Z)
-````
-Tehát a 
-
-[![\\ j\mapsto \Pr(Y=y_j\mid X=x_i),\qquad X=x_i\quad const.](https://latex.codecogs.com/svg.latex?%5C%5C%20j%5Cmapsto%20%5CPr(Y%3Dy_j%5Cmid%20X%3Dx_i)%2C%5Cqquad%20X%3Dx_i%5Cquad%20const.)](#_)
-
-függvény valószínűségi eloszlás és **feltételes valószínűségi eloszlásnak** hívjuk. És valóban, az oszlopok összege kiadja az 1-et:
-
-[![\\ \sum\limits_{j=1}^k\Pr(Y=y_i\;\mid\; X=x_i)= 1](https://latex.codecogs.com/svg.latex?%5C%5C%20%5Csum%5Climits_%7Bj%3D1%7D%5Ek%5CPr(Y%3Dy_i%5C%3B%5Cmid%5C%3B%20X%3Dx_i)%3D%201)](#_)
-
-Az X*Y szintén eloszlás:
-
-[![\\ (i,j)\mapsto \Pr(Y=y_j\;\&\; X=x_i)](https://latex.codecogs.com/svg.latex?%5C%5C%20(i%2Cj)%5Cmapsto%20%5CPr(Y%3Dy_j%5C%3B%5C%26%5C%3B%20X%3Dx_i))](#_)
-
-az úgy nevezett **joint eloszlás.** Ez írja le teljes pontossággal a változók egymástól való függését. 
-
-A **szorzatszabály** szerint P(X=i,Y=j) = P(Y=j|X=i) P(X=i), azaz pl.: P(X=1,Y=1) = 1/8 * 1/2.
-
-[![\\ (i,j)\mapsto \Pr(Y=y_j\;\&\; X=x_i)= \Pr(Y=y_j\mid X=x_i)\cdot \Pr(X=x_i)](https://latex.codecogs.com/svg.latex?%5C%5C%20(i%2Cj)%5Cmapsto%20%5CPr(Y%3Dy_j%5C%3B%5C%26%5C%3B%20X%3Dx_i)%3D%20%5CPr(Y%3Dy_j%5Cmid%20X%3Dx_i)%5Ccdot%20%5CPr(X%3Dx_i))](#_)
-
-vagy az awkward jelöléssel: 
-
-[![\\ \Pr(Y\;\cdot\; X)= \Pr(Y\mid X)\cdot \Pr(X)](https://latex.codecogs.com/svg.latex?%5C%5C%20%5CPr(Y%5C%3B%5Ccdot%5C%3B%20X)%3D%20%5CPr(Y%5Cmid%20X)%5Ccdot%20%5CPr(X))](#_)
-
-Ekkor (X,Y) eloszlása már igazi, együttes, "joint" eloszlás. 
-
-|      |  X=1   | X=0 |  
-| ---  | --- | --- | 
-|  Y=1 |  1/16 | 1/26 | 
-|  Y=0 | 7/16 | 6/13  | 
-
-Viszont ha Y-t rögzítjük, akkor P(Y|X) nem lesz valószínűségi eloszlás, akkor az az úgy nevezett **likelihood függvény:**
-
-[![\\ x_i\mapsto\Pr(Y=y_i\;\mid\; X=x_i)\ne 1, \qquad y_j=const.](https://latex.codecogs.com/svg.latex?%5C%5C%20x_i%5Cmapsto%5CPr(Y%3Dy_i%5C%3B%5Cmid%5C%3B%20X%3Dx_i)%5Cne%201%2C%20%5Cqquad%20y_j%3Dconst.)](#_)
-
-Valóban, általában a sorok összege nem 1:
-
-[![\\ \sum\limits_{i=1}^k\Pr(Y=y_i\;\mid\; X=x_i)\ne 1, \qquad y_j=const.](https://latex.codecogs.com/svg.latex?%5C%5C%20%5Csum%5Climits_%7Bi%3D1%7D%5Ek%5CPr(Y%3Dy_i%5C%3B%5Cmid%5C%3B%20X%3Dx_i)%5Cne%201%2C%20%5Cqquad%20y_j%3Dconst.)](#_)
-
-DE ez is egy nagyon hasznos függvény. Egy interperetáció, ezt ez a szám azt mondja, meg, hogy az adat milyen valószínű a különböző lehetséges világokban. Pl. fent az egyik világban magyar, a másikban francia kártya van. Az egyik világban a király valószínűsége nagyobb, mint a másikban. Ezért ha királyt húzunk, akkor nagyobb valószínűséggel vagyunk a "magyar" világban. Ezt a módszert hívjuk **maximum likelihood** módszernek. A Bayes-féle modellkiválasztás ennek egy spéci verziója és Pearson majdnem kitalálta az 1890-es években. 
-
-### Függetlenség ###
-
-Az $X$ és $Y$ változó függetlensége megfogalmazható a feltételes valószínűséggel is. A szorzatszabály szerint: 
-
-$$\Pr(XY)=\Pr(YX)=\Pr(Y\mid X)\cdot\Pr(X)$$
-de ha $Y$ nem függ $X$-től, akkor az azt jelenti, hogy $\Pr(Y\mid X)=\Pr(Y)$, hiszen a függetlenség definíciója, hogy 
-$$\Pr(XY)=\Pr(Y)\cdot\Pr(X)$$
 
 ## Monty Hall- (vos Savant-) paradoxon
 
