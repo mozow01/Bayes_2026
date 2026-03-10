@@ -133,7 +133,7 @@ A negatív binomiális eloszlás szokásos paraméterezése: az $r$ rögzített,
 
 A számítás. Tudjuk, hogy az utolsó eset siker. Egy ilyen konkrét sorozat valószínűsége
 
-$$(1-p)^k p^{r-1}$$
+$$(1-p)^k p^{r}$$
 
 Az első $k+r-1$ helyen a $k$ kudarcot $\binom{k+r-1}{k}$ féleképpen lehet elrendezni. Az egymást kölcsönösen kizáró lehetőségeket összeadva kapjuk a fenti összefüggést.
 
