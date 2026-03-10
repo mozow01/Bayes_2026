@@ -253,8 +253,10 @@ var eloszlás = Enumerate(vosSavantProblem)
 viz.marginals(eloszlás)
 ````
 
-Láthatóan a váltás a nyerő stratégia.
+## Útravaló
 
+Egy háromopciós (A, B, C) vizsgakérdésnél az "A" válaszra tippelsz, mire a tanár a lapodra pillant, és a "C" opcióra bökve közli, hogy az biztosan helytelen. Ismert tény, hogy ha a tanár algoritmusa egy hibás alternatíva szándékos felfedése volt a maradékból, akkor a "B"-re váltás nyerési esélye 2/3-ra nő.
 
+Mit tennél, ha a tanár tekintete csupán véletlenszerűen esett a "C"-re, és csak azért szólt, mert az történetesen tényleg hibás volt? Vajon pusztán az adat (a megfigyelés) generatív folyamatának ezen eltérése miatt azonnal 50-50%-ra omlik össze a valószínűség, vagy ekkor is a váltás marad a racionális döntés?
 
 
