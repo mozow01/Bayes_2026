@@ -69,6 +69,8 @@ Ez már egy inferálás: a H1, H2, H3 látens változókat inferáljuk (követke
 
 Tehát van egy _p_ valószínűségű Boole-változó (Bernoulli-változó) és definiálunk egy új változót: _X_ jelentse azt, hogy ha _n_-szer egy ilyen ($p$ szerint igazat vagy hamisat adó) kísérletet végrehajtunk (egymástól **függetlenül**), akkor ebből hányszor lesz _igaz_.
 
+○ ○ ● ● ○ ● ○
+
 A képlet magyarázata röviden a következő. Ha pontosan tudnánk, hogy az $n$ hosszú kísérletsorozatból az első $k$-ban teljesül ($p$ valószínűséggel) a vizsgált tulajdonság, a többiben nem, akkor ennek a sorozatban a valószínűsége: $p^k(1-p)^{n-k}$, hiszen az elemi kimenetelek függetlenek és a komplementer esemény valószínűsége $1-p$, amiből $n-k$ van. No, most már képzeljünk el $n$ helyet egymás mellett, amelyekre az igaz szót tesszük le. Amikor az a kérdés, hogy $k$ igazat hányféleképpen tudunk erre az $n$ helyre letenni, akkor a válasz $\binom{n}{k}$. Mindegyik elrendezés megfelel a $k$ db igaz feltételnek, továbbá az ilyen lerakások kölcsönösen kizárják egymást, ezért ezeket csak össze kell adni, ezt megteszi az n-alatt a k szorzó. 
 
 ## Kudarcorientált sikervadászat: negatív binomiális eloszlás 
@@ -131,11 +133,15 @@ $$
 
 A negatív binomiális eloszlás szokásos paraméterezése: az $r$ rögzített, a próbákat egymástól **függetlenül** ismételjük, és azt nézzük, hány kudarc ($k$) gyűlik össze, mire megérkezik az $r$-edik siker.
 
-A számítás. Tudjuk, hogy az utolsó eset siker. Egy ilyen konkrét sorozat valószínűsége
+A számítás: tudjuk, hogy az utolsó eset siker. Egy ilyen konkrét sorozat valószínűsége
 
 $$(1-p)^k p^{r}$$
 
-Az első $k+r-1$ helyen a $k$ kudarcot $\binom{k+r-1}{k}$ féleképpen lehet elrendezni. Az egymást kölcsönösen kizáró lehetőségeket összeadva kapjuk a fenti összefüggést.
+Az első $k+r-1$ helyen a $k$ kudarcot $\binom{k+r-1}{k}$ féleképpen lehet elrendezni. 
+
+○ ○ ● ● ○ ○ ●
+
+Az egymást kölcsönösen kizáró lehetőségeket összeadva kapjuk a fenti összefüggést.
 
 ### Picit érdekesebb kérdés
 
