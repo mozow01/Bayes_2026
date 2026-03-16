@@ -31,21 +31,6 @@ $$P(\Omega)=1 \qquad \text{és} \qquad P(\varnothing)=0$$
 
 $$P(A\cup B)=P(A)+P(B)$$
 
-### 💻 WebPPL példa
-Egy egyszerű fair érmefeldobás modellje, ahol látszik, hogy a kimenetelek (Fej=true, Írás=false) összege pontosan 1 (Normáltság).
-
-```javascript
-var model = function () {
-  var X = flip(0.5);   // 50% true (fej), 50% false (írás)
-  return X;
-};
-
-// Az enumerate módszer végigveszi az összes (Ω) eseményt:
-viz(Infer({method: "enumerate", model: model}));
-```
-
----
-
 ## 2. Következmények és további fogalmak
 
 Az axiómákból nagyon hasznos hétköznapi szabályok következnek.
@@ -64,7 +49,58 @@ $$P(A\cap B)=P(A)\cdot P(B)$$
 
 Azaz ha az egyik bekövetkezése nem ad információt a másikról.
 
-### 💻 WebPPL Példa: Függetlenség és Unió
+### 💻 WebPPL példa: halmazműveletek és eseménytér a dobókockán
+
+A valószínűségszámításban az események valójában halmazok, a rajtuk végzett műveletek (metszet, unió, komplementer) pedig a programozásban egyszerű logikai operátoroknak (`&&`, `||`, `!`) felelnek meg. 
+
+Nézzünk egy komplexebb példát egy dobókockával!
+
+```javascript
+var model = function() {
+  // 1. Elemi események tere (Ω): 1-től 6-ig egyenlő eséllyel
+  var dobas = randomInteger(6) + 1; 
+
+  // 2. Alapesemények definiálása
+  var A = (dobas % 2 === 0);       // A: Páros szám (2, 4, 6) -> P(A) = 3/6 = 0.5
+  var B = (dobas > 3);             // B: Nagyobb, mint 3 (4, 5, 6) -> P(B) = 3/6 = 0.5
+
+  // 3. Halmazműveletek (Kolmogorov-axiómák és következményeik)
+  
+  // Komplementer (A^c): NEM páros (tehát páratlan: 1, 3, 5)
+  var komplementer_A = !A;         
+  
+  // Metszet (A ∩ B): Páros ÉS nagyobb, mint 3 (Közös rész: 4, 6)
+  var metszet = A && B;            
+  
+  // Unió (A ∪ B): Páros VAGY nagyobb, mint 3 (Összes érintett: 2, 4, 5, 6)
+  var unio = A || B;               
+  
+  // Különbség (A \ B): Páros, DE nem nagyobb, mint 3 (Csak a 2-es)
+  var A_minusz_B = A && !B;        
+
+  // Visszaadjuk az összes eseményt, hogy lássuk a valószínűségi eloszlásukat
+  return {
+    "1_P(A) [Páros]": A,
+    "2_P(B) [Nagyobb 3]": B,
+    "3_P(A^c) [Komplementer]": komplementer_A,
+    "4_P(A ∩ B) [Metszet]": metszet,
+    "5_P(A ∪ B) [Unió]": unio,
+    "6_P(A \\ B) [Különbség]": A_minusz_B
+  };
+};
+
+// Az enumerate módszer végigzongorázza mind a 6 lehetséges univerzumot,
+// és kiszámolja az egyes események (halmazok) pontos valószínűségét.
+var eloszlas = Infer({method: "enumerate", model: model});
+viz.marginals(eloszlas);
+```
+
+**Mit fogunk látni az eredményben?**
+* **$P(A \cap B)$ (Metszet):** `0.333` (kb. 33%), hiszen a 6 lehetőségből csak a 4-es és a 6-os felel meg mindkét feltételnek (2/6).
+* **$P(A \cup B)$ (Unió):** `0.666` (kb. 66%), hiszen a 2, 4, 5, 6 kimenetelek mind jók nekünk (4/6). Itt gyönyörűen látszik az Unió szabálya is: $0.5 + 0.5 - 0.333 = 0.666$.
+
+
+### 💻 WebPPL példa: függetlenség és unió
 Nézzük meg, mi történik, ha két független eseményünk van (A és B)!
 
 ```javascript
@@ -81,29 +117,44 @@ var model = function() {
 viz.marginals(Infer({method: "enumerate", model: model}));
 ```
 
----
-
-## 3. Eloszlások (hogyan oszlik el a valószínűség?)
+## 3. Eloszlások (hogyan oszlik meg a valószínűség?)
 
 Egy valószűnűségi **eloszlás** azt mondja meg, hogyan rendeljük hozzá a valószínűséget ($P$) a lehetséges kimenetekhez.
 * **Diszkrét esetben:** egyszerűen felsoroljuk a kimeneteleket és a %-os esélyüket.
 * **Folytonos esetben:** sűrűségfüggvénnyel vagy eloszlásfüggvénnyel dolgozunk (később).
 
-### 💻 WebPPL példa
+### 🎲 A "Catan-eloszlás": Amikor a valószínűség társasjátékká válik
+
+Gondolj a *Catan telepesei* (Settlers of Catan) nevű népszerű társasjátékra. Ha még sosem játszottál vele: a táblán hatszögletű mezők vannak, rajtuk 2-től 12-ig számokkal. A játékosok a körük elején **két dobókockával** dobnak, és a kapott összeg határozza meg, melyik mező ad nyersanyagot.
+
+A kezdő játékosok gyakran véletlenszerűen építkeznek. A profik viszont tudják a matekot: egyetlen kocka dobása egyenletes eloszlású, de **két kocka összege már nem az**! 
+
+* A 7-es összeg a leggyakoribb, mert **hatféleképpen** jöhet ki (1+6, 2+5, 3+4, 4+3, 5+2, 6+1).
+* A 2-es vagy a 12-es viszont nagyon ritka, mert csak **egyféleképpen** jöhet ki (1+1 vagy 6+6).
+
+
+
+A játék tervezői zseniálisan beépítették ezt a matematikát: a számkorongokon apró pöttyök jelzik, hány elemi esemény (kockakombináció) vezet ahhoz az összeghez. A 6-os és 8-as alatt 5 pötty van, a 12-es alatt csak 1. Amikor Catan-t játszol, valójában egy diszkrét együttes eloszlásra (joint eloszlásra) fogadsz!
+
+### 💻 WebPPL Példa: Két kocka összege
+Lássuk, hogyan generálódik a piramis-alakú Catan-eloszlás a kódban!
 
 ```javascript
-var model = function () {
-  var weather = categorical({
-    ps: [0.2, 0.5, 0.3], // Ezeknek is ki kell adniuk az 1-et!
-    vs: ["napos", "felhős", "esős"]
-  });
-  return weather;
+var model = function() {
+  // Két független, szabályos dobókocka (uniform eloszlás 1-től 6-ig)
+  var kocka1 = randomInteger(6) + 1;
+  var kocka2 = randomInteger(6) + 1;
+
+  // A valószínűségi változónk (X) a két kocka összege
+  var X = kocka1 + kocka2;
+
+  return X;
 };
 
-viz(Infer({method: "enumerate", model: model}));
+// Az 'enumerate' végigveszi az összes (6x6 = 36) lehetséges elemi kimenetelt
+var eloszlas = Infer({method: "enumerate", model: model});
+viz.auto(eloszlas);
 ```
-
----
 
 ## 4. Függő változók és a feltételes valószínűség
 
