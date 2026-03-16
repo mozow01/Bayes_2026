@@ -123,9 +123,9 @@ Egy valószűnűségi **eloszlás** azt mondja meg, hogyan rendeljük hozzá a v
 * **Diszkrét esetben:** egyszerűen felsoroljuk a kimeneteleket és a %-os esélyüket.
 * **Folytonos esetben:** sűrűségfüggvénnyel vagy eloszlásfüggvénnyel dolgozunk (később).
 
-### 🎲 A "Catan-eloszlás": Amikor a valószínűség társasjátékká válik
+### 🎲 A "Catan-eloszlás"
 
-![Catan tábla és valószínűségek](catan.png)
+<img src="catan.png" alt="Catan tábla és valószínűségek" width="200">
 
 A *Catan telepesei* (Settlers of Catan) nevű társasjátékban el van rejtve egy matematikai feladvány. A táblán hatszögletű mezők vannak, rajtuk 2-től 12-ig számok. A játékosok a körük elején **két dobókockával** dobnak, és a kapott összeg határozza meg, melyik számú mezők adnak nyersanyagot (fát, gabonát, ...).
 
