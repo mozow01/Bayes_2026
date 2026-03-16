@@ -136,7 +136,7 @@ Egyetlen kocka dobása egyenletes eloszlású, de **két kocka összege már nem
 
 A játék tervezői beépítették ezt a matekot: a számkorongokon apró pöttyök jelzik, hány elemi esemény (kockakombináció) vezet ahhoz az összeghez. A 6-os és 8-as alatt 5 pötty van, a 12-es alatt csak 1. Amikor Catan-t játszunk, valójában egy diszkrét együttes eloszlásra (joint eloszlásra) fogadsz!
 
-### 💻 WebPPL Példa: Két kocka összege
+### 💻 WebPPL példa: két kocka összege
 Lássuk, hogyan generálódik a piramis-alakú Catan-eloszlás a kódban!
 
 ```javascript
@@ -153,6 +153,34 @@ var model = function() {
 
 // Az 'enumerate' végigveszi az összes (6x6 = 36) lehetséges elemi kimenetelt
 var eloszlas = Infer({method: "enumerate", model: model});
+viz.auto(eloszlas);
+```
+
+### Catan játék szimuláció
+
+```javascript
+var catanKor = function() {
+  // 1. A sors keze: golyóálló kockadobás definiálása
+  // A WebPPL automatikusan elosztja a valószínűségeket (1/6 mindegyikre)
+  var kocka1 = categorical({ps: [1,1,1,1,1,1], vs: [1,2,3,4,5,6]});
+  var kocka2 = categorical({ps: [1,1,1,1,1,1], vs: [1,2,3,4,5,6]});
+  
+  var dobas = kocka1 + kocka2;
+
+  // 2. A játék logikája (Kimenetelek kiértékelése)
+  var eredmeny = 
+    (dobas === 7) ? "1_RABLÓ (7-es)" :
+    (dobas === 8 || dobas === 6) ? "2_NYERŐ (6-os vagy 8-as)" :
+    (dobas === 3) ? "3_MEGLEPI, fa (ritka 3-as)" :
+    "4_UNCSI (a többi szám)";
+
+  return eredmeny;
+};
+
+// Végigzongorázzuk az összes párhuzamos univerzumot (36 eset)
+var eloszlas = Infer({method: "enumerate", model: catanKor});
+
+// Kirajzoljuk a pontos esélyeket (a viz() vagy viz.auto())
 viz.auto(eloszlas);
 ```
 
@@ -174,7 +202,7 @@ var model = function () {
     vs: ["esik", "nem esik"]
   });
 
-  // A dugó eloszlása FÜGG az eső értékétől (Feltételes eloszlás)
+  // A dugó eloszlása FÜGG az eső értékétől (feltételes eloszlás)
   var T = (R === "esik") 
       ? categorical({ps: [1/2, 1/2], vs: ["dugó", "nincs dugó"]})
       : categorical({ps: [1/4, 3/4], vs: ["dugó", "nincs dugó"]});
@@ -192,8 +220,9 @@ $$P(T=\text{dugó}) = P(T=\text{dugó}\mid R=\text{igen})P(R=\text{igen}) + P(T=
 
 $$P(T=\text{dugó}) = \frac{1}{2}\cdot\frac{1}{3} + \frac{1}{4}\cdot\frac{2}{3} = \frac{1}{6} + \frac{1}{6} = \frac{1}{3}$$
 
+Ezek motiválják a feltételes valószínűséget.
 
-## 5. A Feltételes valószínűség matematikai definíciója
+## 5. Feltételes valószínűség
 
 A feltételes valószínűség lényege, hogy **leszűkítjük az elemi események terét** a feltételnek megfelelő esetekre. Ha tudjuk, hogy $B$ megtörtént, már csak $\Omega$ ezen részében gondolkodunk.
 
@@ -205,22 +234,43 @@ Ebből egyenesen következik a **szorzatszabály** (ami a Bayes-tétel alapja is
 
 $$P(A\cap B)=P(A\mid B)\cdot P(B)$$
 
-## 6. Joint (Együttes) eloszlás vs. Feltételes eloszlás
+## 6. Joint (többváltozós, együttes) eloszlás vs. feltételes eloszlás
 
-### 🃏 A Pénz és Kártya Példa
+### 🃏 A pénzérme és kártya példa
 Legyen $X$ egy érmefeldobás ($1=$ Fej, $0=$ Írás, 50-50%). 
 Legyen $Y=1$ az, hogy királyt húzunk egy pakliból. 
-* Ha $X=1$ (Fej), magyar kártyából húzunk: $P(Y=1\mid X=1) = \frac{1}{8}$
-* Ha $X=0$ (Írás), francia kártyából húzunk: $P(Y=1\mid X=0) = \frac{1}{13}$
+* Ha $X=1$ (Fej), magyar kártyapakliból húzunk: $P(Y=1\mid X=1) = \frac{1}{8}$
+* Ha $X=0$ (Írás), francia kártyapakliból húzunk: $P(Y=1\mid X=0) = \frac{1}{13}$
+
+```javascript
+var model = function () {
+  // 1. A független változó (X): érmefeldobás
+  var fej = flip(0.5); 
+
+  // 2. A függő változó (Y): királyt húzunk-e?
+  // Ha fej (magyar pakli): 1/8 az esély. Ha írás (francia pakli): 1/13 az esély.
+  var kiraly = fej ? flip(1/8) : flip(1/13); 
+
+  // Visszaadjuk a teljes univerzumot (X és Y együttesét)
+  return {
+    "pakli (X)": fej ? "1_magyar (fej)" : "2_francia (írás)",
+    "húzás (Y)": kiraly ? "👑 király" : "nincs király"
+  };
+};
+
+// Az enumerate kiszámolja a Joint táblázatot
+var jointEloszlas = Infer({method: "enumerate", model: model});
+viz.auto(jointEloszlas);
+```
 
 | Feltételes eloszlás $P(Y \mid X)$ | $X=1$ | $X=0$ |
 | :--- | :---: | :---: |
 | $P(Y=1\mid X)$ | $1/8$ | $1/13$ |
 | $P(Y=0\mid X)$ | $7/8$ | $12/13$ |
 
-*(Figyeld meg: az oszlopok összege ad ki 1-et, hiszen rögzített X mellett ezek érvényes eloszlások.)*
+*(Figyeld meg: az oszlopok összege ad ki 1-et, hiszen rögzített X mellett ezek valóságos eloszlások.)*
 
-A **Joint (Együttes) eloszlás** $P(X,Y)$ megkapható a szorzatszabállyal: $P(X,Y) = P(Y \mid X) \cdot P(X)$. Mivel $P(X)=0.5$, minden cellát elosztunk kettővel:
+A **Joint (együttes) eloszlás** $P(X,Y)$ megkapható a szorzatszabállyal: $P(X,Y) = P(Y \mid X) \cdot P(X)$. Mivel $P(X)=0.5$, minden cellát elosztunk kettővel:
 
 | Joint eloszlás $P(X, Y)$ | $X=1$ | $X=0$ |
 | :--- | :---: | :---: |
@@ -230,21 +280,17 @@ A **Joint (Együttes) eloszlás** $P(X,Y)$ megkapható a szorzatszabállyal: $P(
 *(Itt már a teljes táblázat (az összes cella) összege 1, mert ez az összes lehetséges univerzum terét írja le.)*
 
 ### 💡 Likelihood (Mi a különbség?)
-Ha az egyenletben a kimenet ($Y=y_j$) van rögzítve (pl. megfigyeltük, hogy királyt húztunk), és azt vizsgáljuk, ez mennyire valószínű az $X$ különböző paraméterei (modellek) mellett, azt **Likelihood-függvénynek** hívjuk. Ennek az értékei nem feltétlenül adnak ki 1-et!
+Ha a kimenet ($Y=y_j$) van rögzítve (pl. megfigyeltük, hogy királyt húztunk), és azt vizsgáljuk, ez mennyire valószínű az $X$ különböző paraméterei (modellek) mellett, azt **Likelihood-függvénynek** hívjuk. Ennek az értékei nem feltétlenül adnak ki 1-et!
 
----
+## 7. Bayesiánus inferencia: visszafelé következtetés
 
-## 7. A Bayes-i Inferencia Csúcsa: Visszafelé következtetés
-
-Lépjünk szintet! Mi van, ha nem a jövőt jósoljuk, hanem a kimenetből (késés) akarunk visszakövetkeztetni az okokra (eső, dugó)?
-
-A Bayes-i gondolkodásban megkülönböztetünk:
+A Bayesiánus gondolkodásban megkülönböztetünk:
 * **Prior eloszlást:** Amit a világ működéséről gondolunk a megfigyelés előtt.
 * **Posterior eloszlást:** A frissített tudásunkat az adatok (megfigyelések) megismerése után.
 
-### 💻 WebPPL Példa: "Esett vagy nem esett, ha tudom, hogy késtem?"
+### 💻 WebPPL példa: "Esett vagy nem esett, ha tudom, hogy késtem?"
 
-Itt jön be a `condition()` utasítás ereje. Leszűkítjük a lehetséges világok számát azokra, ahol a késés tényleg megtörtént.
+A `condition()` utasítás szelektál. Leszűkítjük a lehetséges világok számát azokra, ahol a késés tényleg megtörtént.
 
 ```javascript
 var model = function () {
@@ -273,23 +319,20 @@ Amikor ezt lefuttatod, látni fogod: az eső eredeti 20%-os esélye (prior) dras
 
 ---
 
-## 📚 Mini Szótár a Túléléshez
+## Fogalmak
 
-* **$\Omega$ (Elemi események tere):** Minden, ami megtörténhet.
-* **$\Sigma$ (Eseménytér):** Az események (részhalmazok), amiknek valószínűséget adhatunk.
-* **$P$ (Valószínűségi mérték):** A Kolmogorov-axiómákat teljesítő függvény.
-* **Joint (együttes) eloszlás:** Változók együttmozgásának teljes térképe, $P(X,Y)$. A cellák összege 1.
-* **Feltételes eloszlás:** Egy változó eloszlása egy másik *rögzített* értéke mellett, $P(Y \mid X)$. Az oszlopok összege 1.
-* **Marginalizáció:** Egy vagy több változó "kiejtése" a joint eloszlásból egyszerű összeadással.
-* **Prior:** Amit azelőtt tudtunk, hogy megláttuk volna az adatot.
-* **Posterior:** A frissített tudásunk az adat megfigyelése után.
-* **Likelihood:** Megmutatja, hogy egy megfigyelt adat mennyire valószínű a különböző hipotézisek/modellek fényében.
+* **$\Omega$ (Elemi események tere):** minden, ami megtörténhet.
+* **$\Sigma$ (Eseménytér):** az események (részhalmazok), amiknek valószínűséget adhatunk.
+* **$P$ (Valószínűségi mérték):** a Kolmogorov-axiómákat teljesítő függvény.
+* **Joint (együttes) eloszlás:** változók együttmozgásának teljes térképe, $P(X,Y)$. A cellák összege 1.
+* **Feltételes eloszlás:** egy változó eloszlása egy másik *rögzített* értéke mellett, $P(Y \mid X)$. Az oszlopok összege 1.
+* **Marginalizáció:** egy vagy több változó "kiejtése" a joint eloszlásból egyszerű összeadással.
+* **Prior:** amit azelőtt tudtunk, hogy megláttuk volna az adatot.
+* **Posterior:** a frissített tudásunk az adat megfigyelése után.
+* **Likelihood:** megmutatja, hogy egy megfigyelt adat mennyire valószínű a különböző hipotézisek/modellek fényében.
 
 ---
 
-## 🧠 Ellenőrző Kérdések a Villamosra
+## Útravaló:
 
-1. Miben különbözik zeneileg (akarom mondani, statisztikailag) a $P(A)$ és a $P(A\mid B)$?
-2. Miért nem ugyanaz a feltételes eloszlás táblázata és a joint eloszlás táblázata? (Segítség: hol adódik össze az 1?)
-3. Mit jelent az hétköznapi nyelven, ha $P(X, Y) = P(X) \cdot P(Y)$?
-4. Ha a WebPPL kódba beteszel egy `condition()` sort, az melyik eloszlást csinálja meg a másikból: a posteriorból a priort, vagy fordítva?
+Miért nem ugyanaz a feltételes eloszlás táblázata és a joint eloszlás táblázata? 
