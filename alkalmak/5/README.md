@@ -10,8 +10,6 @@ Kell még:
 
 3. Hogyan jutunk el a **feltételes valószínűségig** és a **Bayes-inferenciáig**?
 
----
-
 ## 1. A Kolmogorov-axiómák (a játékszabályok)
 
 A valószínűség matematikai reprezentációjának alapja az $(\Omega,\Sigma,P)$ hármas, amit **valószínűségi mezőnek** nevezünk:
