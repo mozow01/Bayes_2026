@@ -22,13 +22,16 @@ A valószínűség matematikai reprezentációjának alapja az $(\Omega,\Sigma,P
 Formálisan a $P$ függvénynek három feltételt kell betartania:
 
 > **1. Nemnegativitás:** Minden $A\in\Sigma$ eseményre a valószínűség sosem negatív:
-> $$P(A)\ge 0$$
-> 
+
+$$P(A)\ge 0$$
+ 
 > **2. Normáltság:** A teljes eseménytér (valaminek biztosan történnie kell) valószínűsége 1, a lehetetlen eseményé pedig 0:
-> $$P(\Omega)=1 \qquad \text{és} \qquad P(\varnothing)=0$$
-> 
+
+$$P(\Omega)=1 \qquad \text{és} \qquad P(\varnothing)=0$$
+ 
 > **3. Additivitás:** Ha $A,B\in\Sigma$ **egymást kizáró események** (azaz $A\cap B=\varnothing$), akkor:
-> $$P(A\cup B)=P(A)+P(B)$$
+
+$$P(A\cup B)=P(A)+P(B)$$
 
 ### 💻 WebPPL példa
 Egy egyszerű fair érmefeldobás modellje, ahol látszik, hogy a kimenetelek (Fej=true, Írás=false) összege pontosan 1 (Normáltság).
