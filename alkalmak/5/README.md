@@ -125,16 +125,16 @@ Egy valószűnűségi **eloszlás** azt mondja meg, hogyan rendeljük hozzá a v
 
 ### 🎲 A "Catan-eloszlás": Amikor a valószínűség társasjátékká válik
 
-Gondolj a *Catan telepesei* (Settlers of Catan) nevű népszerű társasjátékra. Ha még sosem játszottál vele: a táblán hatszögletű mezők vannak, rajtuk 2-től 12-ig számokkal. A játékosok a körük elején **két dobókockával** dobnak, és a kapott összeg határozza meg, melyik mező ad nyersanyagot.
+![Catan tábla és valószínűségek](catan.png)
 
-A kezdő játékosok gyakran véletlenszerűen építkeznek. A profik viszont tudják a matekot: egyetlen kocka dobása egyenletes eloszlású, de **két kocka összege már nem az**! 
+A *Catan telepesei* (Settlers of Catan) nevű társasjátékban el van rejtve egy matematikai feladvány. A táblán hatszögletű mezők vannak, rajtuk 2-től 12-ig számok. A játékosok a körük elején **két dobókockával** dobnak, és a kapott összeg határozza meg, melyik számú mezők adnak nyersanyagot (fát, gabonát, ...).
+
+Egyetlen kocka dobása egyenletes eloszlású, de **két kocka összege már nem az**: 
 
 * A 7-es összeg a leggyakoribb, mert **hatféleképpen** jöhet ki (1+6, 2+5, 3+4, 4+3, 5+2, 6+1).
 * A 2-es vagy a 12-es viszont nagyon ritka, mert csak **egyféleképpen** jöhet ki (1+1 vagy 6+6).
 
-
-
-A játék tervezői zseniálisan beépítették ezt a matematikát: a számkorongokon apró pöttyök jelzik, hány elemi esemény (kockakombináció) vezet ahhoz az összeghez. A 6-os és 8-as alatt 5 pötty van, a 12-es alatt csak 1. Amikor Catan-t játszol, valójában egy diszkrét együttes eloszlásra (joint eloszlásra) fogadsz!
+A játék tervezői beépítették ezt a matekot: a számkorongokon apró pöttyök jelzik, hány elemi esemény (kockakombináció) vezet ahhoz az összeghez. A 6-os és 8-as alatt 5 pötty van, a 12-es alatt csak 1. Amikor Catan-t játszunk, valójában egy diszkrét együttes eloszlásra (joint eloszlásra) fogadsz!
 
 ### 💻 WebPPL Példa: Két kocka összege
 Lássuk, hogyan generálódik a piramis-alakú Catan-eloszlás a kódban!
@@ -187,22 +187,23 @@ viz.table(Infer({method: "enumerate", model: model}));
 
 ### 🧮 A teljes valószínűség tétele (marginalizáció)
 Ha arra vagyunk kíváncsiak, mekkora a dugó esélye *összességében* (függetlenül az esőtől), össze kell adnunk az ágakat:
+
 $$P(T=\text{dugó}) = P(T=\text{dugó}\mid R=\text{igen})P(R=\text{igen}) + P(T=\text{dugó}\mid R=\text{nem})P(R=\text{nem})$$
+
 $$P(T=\text{dugó}) = \frac{1}{2}\cdot\frac{1}{3} + \frac{1}{4}\cdot\frac{2}{3} = \frac{1}{6} + \frac{1}{6} = \frac{1}{3}$$
 
----
 
 ## 5. A Feltételes valószínűség matematikai definíciója
 
 A feltételes valószínűség lényege, hogy **leszűkítjük az elemi események terét** a feltételnek megfelelő esetekre. Ha tudjuk, hogy $B$ megtörtént, már csak $\Omega$ ezen részében gondolkodunk.
 
 > **Definíció:** Ha $P(B)\neq 0$, akkor az $A$ esemény feltételes valószínűsége $B$ bekövetkezése esetén:
-> $$P(A\mid B)=\frac{P(A\cap B)}{P(B)}$$
 
-Ebből egyenesen következik a **Szorzatszabály** (ami a Bayes-tétel alapja is):
+$$P(A\mid B)=\frac{P(A\cap B)}{P(B)}$$
+
+Ebből egyenesen következik a **szorzatszabály** (ami a Bayes-tétel alapja is):
+
 $$P(A\cap B)=P(A\mid B)\cdot P(B)$$
-
----
 
 ## 6. Joint (Együttes) eloszlás vs. Feltételes eloszlás
 
