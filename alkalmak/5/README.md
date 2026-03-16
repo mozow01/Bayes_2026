@@ -1,10 +1,13 @@
 # 🎲 Bayesiánus modellezés és valószínűségelmélet
 
 Tudjuk:
+
 1. Mit jelent egy valószínűségi algoritmikus modell.
 
 Kell még:
+
 2. Hogyan írjuk le a valószínűségeket a **Kolmogorov-axiómák** segítségével?
+
 3. Hogyan jutunk el a **feltételes valószínűségig** és a **Bayes-inferenciáig**?
 
 ---
