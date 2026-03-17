@@ -294,12 +294,12 @@ A `condition()` utasítás szelektál. Leszűkítjük a lehetséges világok sz�
 
 ```javascript
 var model = function () {
-  // 1. PRIOR MODELLEZÉS (Ahogy a világ generálódik)
+  // 1. PRIOR és MODELLEZÉS 
   var eso = flip(1/5);
   var dugo = eso ? flip(1/2) : flip(1/4);
   var keses = dugo ? flip(0.9) : flip(0.05);
 
-  // 2. MEGFIGYELÉS (Likelihood beépítése / szűrés)
+  // 2. MEGFIGYELÉS
   // Csak azokat a világokat tartjuk meg, ahol tényleg késtem!
   condition(keses === true);
 
