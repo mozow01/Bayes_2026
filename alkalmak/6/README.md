@@ -10,7 +10,7 @@ $$b\sim \mathrm{Bernoulli}(p),\qquad P(X=\mathrm{true})=p$$
 
 valószínűséggel. Megengedjük, hogy a $p$ érték ésszerű módon a $[0;1]$ intervallumból érkezzen: erre **Beta-eloszlást** választunk:
 
-<img width="500" height="400" alt="kép" src="https://github.com/user-attachments/assets/92db2e94-5b07-46c8-8af1-d116b66f545c" />
+<img height="300" alt="kép" src="https://github.com/user-attachments/assets/92db2e94-5b07-46c8-8af1-d116b66f545c" />
 
 Tegyük fel, hogy dobunk 10-et, és gyanúsan sok, 8 fej lesz az eredmény. Nézzük meg, hogyan tolódik el a prior a WebPPL kód segítségével!
 
