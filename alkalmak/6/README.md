@@ -4,9 +4,11 @@
 
 Egy érmét dobálunk. Kérdés: szabályos-e? Ehhez egy bayesiánus modellt építünk.
 
-A megfigyeljók az adat jellegét:  fej (true) vagy írás (false). Mivel minden dobás bináris kimenetelű, a **Bernoulli-eloszlást** használjuk a modellezés alapjául, ami szintén kategorikus, két értékű választ ad vissza, $p$ valószínűséggel. Igaz-hamisokat fog generálni a modell 
+A megfigyeljók az adat jellegét:  fej (true) vagy írás (false). Mivel minden dobás bináris kimenetelű, a **Bernoulli-eloszlást** használjuk a modellezés alapjául, ami szintén kategorikus, két értékű választ ad vissza, $p$ valószínűséggel. Igaz-hamisokat fog generálni a modell:
+
 $$b\sim \mathrm{Bernoulli}(p),\qquad P(X=\mathrm{true})=p$$
-valüszínűséggel. Megengedjük, hogy a $p$ érték ésszerű módon a $[0;1]$ intervallumból érkezzen: erre **Beta-eloszlást** választunk:
+
+valószínűséggel. Megengedjük, hogy a $p$ érték ésszerű módon a $[0;1]$ intervallumból érkezzen: erre **Beta-eloszlást** választunk:
 
 <img width="500" height="400" alt="kép" src="https://github.com/user-attachments/assets/92db2e94-5b07-46c8-8af1-d116b66f545c" />
 
