@@ -1,10 +1,14 @@
 # Bayesiánus adatelemzés I. (Bayesian Data Analysis)
 
-## 1. Bemelegítés: A cinkelt érme (Bernoulli és Beta)
+## 1. Bemelegítés: A cinkelt érme Bernoulli-eloszlás
 
-Képzeljük el, hogy egy érmét dobálunk. Szeretnénk kideríteni, hogy az érme szabályos-e, vagy cinkelt. Ehhez egy bayesiánus modellt építünk.
+Egy érmét dobálunk. Kérdés: szabályos-e? Ehhez egy bayesiánus modellt építünk.
 
-A megfigyelt adatunk az egyes dobások eredménye: fej (igaz/1) vagy írás (hamis/0). Mivel minden dobás bináris kimenetelű, a **Bernoulli-eloszlást** használjuk likelihood-ként. De mi legyen a prior? Mivel nem tudjuk pontosan, mekkora a "fej" dobásának $p$ valószínűsége, egy **Beta-eloszlást** választunk priornak. Mondjuk egy egyenleteshez közeli, de enyhén középre húzó `Beta(2, 2)` eloszlást.
+A megfigyeljók az adat jellegét:  fej (true) vagy írás (false). Mivel minden dobás bináris kimenetelű, a **Bernoulli-eloszlást** használjuk a modellezés alapjául, ami szintén kategorikus, két értékű választ ad vissza, $p$ valószínűséggel. Igaz-hamisokat fog generálni a modell 
+$$b\sim \mathrm{Bernoulli}(p),\qquad P(X=\mathrm{true})=p$$
+valüszínűséggel. Megengedjük, hogy a $p$ érték ésszerű módon a $[0;1]$ intervallumból érkezzen: erre **Beta-eloszlást** választunk:
+
+<img width="500" height="400" alt="kép" src="https://github.com/user-attachments/assets/92db2e94-5b07-46c8-8af1-d116b66f545c" />
 
 Tegyük fel, hogy dobunk 10-et, és gyanúsan sok, 8 fej lesz az eredmény. Nézzük meg, hogyan tolódik el a prior a WebPPL kód segítségével!
 
