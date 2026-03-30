@@ -27,38 +27,40 @@ Ebben a modellben az $\alpha$ és $\beta$ paraméterek „fantom” vagy „psze
 
 Ha 5 sikert akarok feltételezni, miért kell $\alpha = 6$-ot írnom?
 
-A választ a **Bayesiánus nullpont** adja meg. A totális tudatlanság állapota, amikor semmit nem tudunk a világról, a $Beta(1, 1)$ eloszlás.
-* Ebben az állapotban még nulla ($0$) sikert és nulla ($0$) kudarcot láttunk.
+A választ a **Bayesiánus nullpont** adja meg. Ekkor még semmit nem tudunk, ez a $Beta(1, 1)$ eloszlás.
+* Nulla ($0$) sikert és nulla ($0$) kudarcot láttunk.
 * Mivel a képlet szerint $\text{sikerek} = \alpha - 1$ és $\text{kudarcok} = \beta - 1$, ebből következik: $0 = 1 - 1$.
-* Tehát az **1-es érték a matematikai „beugró”**. Ez biztosítja, hogy az eloszlás görbéje értelmezhető maradjon (ne osszunk nullával), és minden, ami ezen felül van, képviseli a ténylegesen tapasztalt vagy feltételezett „extra” adatokat.
+* Matematikailag kényelmes kiindulópont.
 
-### Három forgatókönyv a megértéshez
+### Három szakmai hozzáállás:
 
 1.  **Bayesiánus nullpont**
-    Sosem láttad még ezt az érmét. A képzeletbeli kísérletedben 0 dobás szerepel.
+    Sosem láttad még ezt az érmét. A képzeletbeli kísérletben 0 dobás szerepel.
     $\alpha = 1, \beta = 1 \implies$ **Beta(1, 1)**
-    Ez egy tökéletesen vízszintes vonal (egyenletes eloszlás). Számodra minden valószínűség 0% és 100% között pontosan ugyanannyira hihető.
+    Ez egyenletes eloszlás. Egyfajta non-informatív prior. Minden valószínűség 0% és 100% között pontosan ugyanannyira hihető.
 
-2.  **A „Gyanakvó szemlélő” (gyenge prior)**
-    Úgy sejted, hogy az érme szabályos, de nem tennéd rá az életedet. Olyan, mintha a fejedben már dobtál volna vele kettőt, és 1 fej (siker), illetve 1 írás (kudarc) jött volna ki.
+2.  **„Gyanakvó szemlélő” (gyenge prior)**
+    Úgy sejted, hogy az érme szabályos, de nem tennéd rá a nyakad. Olyan, mintha fejben már dobtál volna kettőt, és 1 fej (siker), illetve 1 írás (kudarc) jött volna ki.
     $\alpha = 1 (\text{alap}) + 1 (\text{fantom}) = 2$
     $\beta = 1 (\text{alap}) + 1 (\text{fantom}) = 2 \implies$ **Beta(2, 2)**
     Ez egy lankás dombot hoz létre 50%-nál. Van már egy elképzelésed, de a valós adatok még könnyen eltolhatják a hitedet.
 
-3.  **A „Makacs szakértő” (erős (dogmatikus) prior)**
-    Tudod, hogy az érme egy precíziós üzemből érkezett, és rendkívül biztos vagy a szabályosságában. Ez olyan, mintha a fejedben már elvégeztél volna 1000 dobást, amiből 500-500 lett az eredmény.
+3.  **„Makacs szakértő” (erős (dogmatikus) prior)**
+    Tudod, hogy az érme honnan érkezett, és rendkívül biztos vagy a tulajdonságaiban. Ez olyan, mintha a fejedben már elvégeztél volna 1000 dobást, amiből pl. 500-500 lett az eredmény (vagy 100-900, de sok!).
     $\alpha = 1 + 500 = 501$
     $\beta = 1 + 500 = 501 \implies$ **Beta(501, 501)**
-    Ez egy hatalmas, tűhegyes tüskét hoz létre pontosan 50%-nál. Ha ezután dobsz 10 valós fejet, a hited alig fog megmozdulni, mert a 10 valós adat eltörpül az 1000 fantom-adatod mellett.
+    Ez egy hegyes tüskét hoz létre. 
 
-Mivel a Béta-eloszlás a Bernoullihoz és a Binomiálishoz asszociált „fantom-megfigyelésként” viselkedik. Amikor megérkeznek a valódi adatok, csak össze kell önteni a képzeletbeli és a valós adatokat:
+A béta eloszlás a Bernoullihoz és a Binomiálishoz asszociált „fantom-megfigyelésként” viselkedik. Amikor megérkeznek a valódi adatok, csak össze kell önteni a képzeletbeli és a valós adatokat:
 
 $$\alpha_{új} = (\text{Fantom sikerek}) + (\text{Valós sikerek}) + 1$$
 $$\beta_{új} = (\text{Fantom kudarcok}) + (\text{Valós kudarcok}) + 1$$
 
-A Béta-eloszlás tehát zökkenőmentesen egyesíti, amit korábban *gondoltunk*, azzal, amit éppen most *tapasztaltunk*.
+A béta eloszlás tehát zökkenőmentesen egyesíti, amit korábban *gondoltunk*, azzal, amit éppen most *tapasztaltunk*.
 
 Ez lesz később a **konjugált prior** ideálképe.
+
+## Példa
 
 Tegyük fel, hogy dobunk 10-et, és gyanúsan sok, 8 fej lesz az eredmény. Nézzük meg, hogyan tolódik el a prior a WebPPL kód segítségével!
 
