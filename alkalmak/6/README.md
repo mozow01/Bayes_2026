@@ -75,57 +75,57 @@ A Bayes-tétel alapján a poszterior valószínűség arányos a generáló mode
 
 $$P(p \mid \text{adat}) \propto P(\text{adat} \mid p) \cdot P(p)$$
 
-1. **Generáló modell: (Bernoulli likelihood):** Ha van $n$ dobásunk, amiből $k$ darab lett fej, akkor az adat valószínűsége $p$ paraméter mellett:
-$$P(\text{adat} \mid p) =  p^k (1-p)^{n-k} \propto p^k (1-p)^{n-k}$$
+1. **Generáló modell: (Bernoulli likelihood):** k = 0 vagy 1
 
-2. **Prior (Beta):** A Beta eloszlás $\alpha$ és $\beta$ paraméterekkel az alábbi formát ölti (a normalizáló konstansokat elhagyva, hiszen csak az arányosságra fókuszálunk):
+$$P(\text{adat} \mid p) =  p^k (1-p)^{1-k}$$
+
+(Vegyük észre, hogy tényleg az történik, hogy a Bernoulli-paramérter = p szcenárióban ez a "random generátor" adatokat ad vissza a fenti valószínűségi eloszlás alapján.)
+
+3. **Prior (Beta):** A beta eloszlás $\alpha$ és $\beta$ paraméterekkel az alábbi formát ölti (a normalizáló konstansokat elhagyva, csak az arányosságra fókuszálva):
 $$P(p) \propto p^{\alpha-1} (1-p)^{\beta-1}$$
 
-3. **Poszterior:** Szorozzuk össze a kettőt!
-$$P(p \mid \text{adat}) \propto \left( p^k (1-p)^{n-k} \right) \cdot \left( p^{\alpha-1} (1-p)^{\beta-1} \right)$$
+4. **Poszterior:** Szorozzuk össze a kettőt megfordítva a feltételeket:
+$$P(p \mid \text{adat}) \propto \left( p^k (1-p)^{1-k} \right) \cdot \left( p^{\alpha-1} (1-p)^{\beta-1} \right)$$
 
 Vonjuk össze az azonos alapú hatványokat:
-$$P(p \mid \text{adat}) \propto p^{(k + \alpha) - 1} (1-p)^{(n - k + \beta) - 1}$$
+$$P(p \mid \text{adat}) \propto p^{(k + \alpha) - 1} (1-p)^{(1 - k + \beta) - 1}$$
 
 Ha ránézünk az eredményre, ez pontosan egy új Beta-eloszlás képlete, ahol az új paraméterek:
 * $\alpha_{\text{új}} = \alpha + k$ (a régi $\alpha$ plusz a sikerek/fejek száma)
 * $\beta_{\text{új}} = \beta + n - k$ (a régi $\beta$ plusz a kudarcok/írások száma)
 
-Tehát az analitikus frissítés pofonegyszerű: csak hozzáadjuk az adatokból származó megfigyeléseket a prior paramétereihez!
+Tehát az analitikusan (kéziszámolással) frissítés annyi, hogy hozzáadjuk az adatokból származó megfigyeléseket a prior paramétereihez!
 
 ---
 
 ## 3. Bayesiánus bestiárium
  
 **Generatív modell:**
-Egy generatív modell olyan függvény, ami nagy adatmennyiséget képes algoritmikusan generálni. Az algoritmus bemenete a **paraméterek**, kimenete a **szimulált adat**. Pszeudo-random generátor, amely úgy produkálja az adatokat, hogy azok nagy átlagban egy adott valószínűségi eloszlásnak megfelelőek legyenek.
+Egy generatív modell olyan függvény, ami adattokat képes algoritmikusan generálni. Az algoritmus bemenete a **paraméterek**, kimenete a **szimulált adat**. Pszeudo-random generátor, amely úgy produkálja az adatokat, hogy azok nagy átlagban egy adott valószínűségi eloszlásnak megfelelőek legyenek.
 
 Ilyennel már találkoztunk. Nem dobáltunk kockát, nem húztunk kártyát, a gép elvégezte helyettünk. Képesek voltunk kockadobást, laphúzást szimulálni programmal.
 
 **Bayesiánus következtetés:** Az előbbi program feladatát megfordítjuk: megpróbálunk visszakövetkeztetni arra, hogy egy valóságosan mért (tehát nem szimulált) $Y = y$ **adat** a generatív modell milyen $X = x$ **paraméterértékeire** tud generálódni. 
 
-**Együttes (Joint) eloszlást** kapunk, ha a paraméterek (látens $X$ változó) és a megfigyelt $Y$ változó terének szorzatán feltételezünk egy $P(X,Y)$ valószínűségi eloszlást, amelyet a szorzatszabállyal számítunk ki (kétféleképpen):
+**Többváltozós (joint) eloszlást** kapunk, ha a paraméterek (**látens** $X$ változó) és a **megfigyelt** $Y$ változó terének szorzatán feltételezünk egy $P(X,Y)$ valószínűségi eloszlást, amelyet a szorzatszabállyal számítunk ki (kétféleképpen):
 
-1. Annak a valószínűsége, hogy adott paraméter mellett az adat éppen a megfigyelt:
+1. $\Pr(Y \mid X)$ annak a valószínűsége, hogy adott paraméter mellett az adat éppen a megfigyelt:
 $$ \Pr(X, Y) = \Pr(Y \mid X) \cdot \Pr(X)$$
 
-2. Illetve megfordítva:
+2. Illetve megfordítva, $\Pr(X \mid Y)$ annak a valószínűsége, hogy a megfigyelt adat estén a látens paraméterérték éppen az adott:
 $$ \Pr(X, Y) = \Pr(X \mid Y) \cdot \Pr(Y)$$
 
 Az adat és a generatív modell még nem elég, mert a paraméterteret is be kell népesíteni paraméterértékekkel, és ehhez valami előzetes tudással kell rendelkeznünk arról, hogy mit gondolunk ezek eloszlásáról. Ez a joint eloszlás egy marginális eloszlása, a $P(X)$ **prior eloszlás**.
 
 A **likelihood függvény** az:
 $$x \mapsto \Pr(Y=y \mid X=x)$$
-függvény. Ha tudjuk a megfigyelt változó értékét (az adatot), akkor a likelihood megmondja, hogy a modellekben ennek az adatnak mekkora a valószínűsége. Ezt az értéket generálja a generatív modell. Arra is használhatjuk, hogy a legvalószínűbb paraméterértéket meghatározzuk belőle (Maximum Likelihood módszer). 
+függvény. Ha tudjuk a megfigyelt változó értékét (az adatot), akkor a likelihood megmondja, hogy a modellekben ennek az adatnak mekkora a valószínűsége. **Ilyen pszeudo-adatokat generál a generatív modell.** Arra is használhatjuk, hogy a legvalószínűbb paraméterértéket meghatározzuk belőle (Maximum Likelihood módszer). 
 
 Világos, hogy ez nem ugyanaz, mint az adat eloszlása:
 $$y \mapsto \Pr(Y=y \mid X=x)$$
 ami egy igazi valószínűségi eloszlás. 
 
-Ami minket igazán érdekel, az a $P(X \mid Y=y)$ **posteriori eloszlás**, ami a fenti szorzatszabályból levezethető:
-$$\Pr(X, Y) = \Pr(X \mid Y) \cdot \Pr(Y) = \Pr(Y \mid X) \cdot \Pr(X)$$
-
-Amiből egyenesen következik a **Bayes-formula**:
+Ami minket **igazán érdekel,** az a $P(X \mid Y=y)$ **posteriori eloszlás**, ami a Bayes-formuma:
 $$\Pr(X \mid Y) = \frac{\Pr(Y \mid X) \cdot \Pr(X)}{\Pr(Y)}$$
 
 > **A bayesiánus eljárás lépései tehát:**
