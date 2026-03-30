@@ -34,7 +34,7 @@ A választ a **Bayesiánus nullpont** adja meg. A totális tudatlanság állapot
 
 ### Három forgatókönyv a megértéshez
 
-1.  **A „Tiszta lap” (Tudatlanság)**
+1.  **Bayesiánus nullpont**
     Sosem láttad még ezt az érmét. A képzeletbeli kísérletedben 0 dobás szerepel.
     $\alpha = 1, \beta = 1 \implies$ **Beta(1, 1)**
     Ez egy tökéletesen vízszintes vonal (egyenletes eloszlás). Számodra minden valószínűség 0% és 100% között pontosan ugyanannyira hihető.
