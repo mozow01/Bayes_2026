@@ -12,6 +12,10 @@ valószínűséggel. Megengedjük, hogy a $p$ érték ésszerű módon a $[0;1]$
 
 <img height="300" alt="kép" src="https://github.com/user-attachments/assets/92db2e94-5b07-46c8-8af1-d116b66f545c" />
 
+https://mozow01.github.io/WebpplHelp/distributions/beta.html
+
+https://en.wikipedia.org/wiki/Beta_distribution
+
 Tegyük fel, hogy dobunk 10-et, és gyanúsan sok, 8 fej lesz az eredmény. Nézzük meg, hogyan tolódik el a prior a WebPPL kód segítségével!
 
 ```javascript
@@ -42,25 +46,42 @@ Az eredményen látható lesz, hogy a `Beta(2, 2)` prior a megfigyelt adatok (so
 
 ---
 
-## 2. A konjugált prior csodája
+## 2. A konjugált prior
 
-A fenti példában szándékosan választottuk a Beta-eloszlást a Bernoulli likelihood mellé. De miért? Azért, mert a Beta-eloszlás a Bernoulli (és a Binomiális) eloszlás **konjugált priorja**. 
+A fenti példában szándékosan választottuk a *Beta-eloszlást* a Bernoulli modell mellé. De miért? Azért, mert a Beta-eloszlás a Bernoulli (és a Binomiális) eloszlás **konjugált priorja**. 
 
 **Mit jelent ez?**
-Egy prior eloszlást akkor nevezünk konjugált priornak egy adott likelihood (adatgeneráló modell) függvényre nézve, ha a prior és a belőle frissített poszterior eloszlás **ugyanabba az eloszláscsaládba** tartozik. Magyarul: ha Betát teszel be, és Bernoulli-val figyeled meg az adatot, a végén garantáltan egy újabb Beta-eloszlást kapsz vissza. Ez analitikusan is kiszámolhatóvá teszi a poszteriort, MCMC szimulációk nélkül is!
+Egy prior eloszlást akkor nevezünk konjugált priornak egy adott adatgeneráló modell (likelihood) függvényre nézve, ha a prior és a belőle frissített poszterior eloszlás **ugyanabba az eloszláscsaládba** tartozik. Magyarul: ha Betát teszel be, és Bernoulli-val figyeled meg az adatot, a végén garantáltan egy újabb Beta-eloszlást kapsz vissza. Ez analitikusan kiszámolhatóvá teszi a poszteriort, MCMC szimulációk nélkül. Amíg nem volt kéznél számítógép, addig ez egy nagyon fontos matematikusi segítség volt.
 
-**A levezetés:**
-A Bayes-tétel alapján a poszterior valószínűség arányos a likelihood és a prior szorzatával:
+**Bayes-tétel:**
+
+Eddig ez még nem volt, mert beteg voltam :( DE most! Nézzük a jointot kétféleképpen, a feltételes valószínűsleg definíciója alapján:
+
+$$\Pr(XY)=\Pr(X\mid Y)\cdot\Pr(Y) $$
+
+$$\Pr(YX)=\Pr(Y\mid X)\cdot\Pr(X) $$
+
+És ezek egyenlők, mert a logikai szorzás kommutatív:
+
+$$\Pr(X\mid Y)\cdot\Pr(Y)=\Pr(Y\mid X)\cdot\Pr(X) $$
+
+Innen 
+
+$$\Pr(X\mid Y)=\dfrac{\Pr(Y\mid X)\cdot\Pr(X)}{\Pr(Y)}$$
+
+(Laplace ezt az inverz valószínűség tételének nevezte, mert az egyik feltételestől a fordított irányúra lehet vele áttérni.)
+
+A Bayes-tétel alapján a poszterior valószínűség arányos a generáló modellből kijövő eloszlás és a prior szorzatával:
 
 $$P(p \mid \text{adat}) \propto P(\text{adat} \mid p) \cdot P(p)$$
 
-1. **A Likelihood (Bernoulli/Binomiális):** Ha van $n$ dobásunk, amiből $k$ darab lett fej, akkor az adat valószínűsége $p$ paraméter mellett:
-$$P(\text{adat} \mid p) = \binom{n}{k} p^k (1-p)^{n-k} \propto p^k (1-p)^{n-k}$$
+1. **Generáló modell: (Bernoulli likelihood):** Ha van $n$ dobásunk, amiből $k$ darab lett fej, akkor az adat valószínűsége $p$ paraméter mellett:
+$$P(\text{adat} \mid p) =  p^k (1-p)^{n-k} \propto p^k (1-p)^{n-k}$$
 
-2. **A Prior (Beta):** A Beta eloszlás $\alpha$ és $\beta$ paraméterekkel az alábbi formát ölti (a normalizáló konstansokat elhagyva, hiszen csak az arányosságra fókuszálunk):
+2. **Prior (Beta):** A Beta eloszlás $\alpha$ és $\beta$ paraméterekkel az alábbi formát ölti (a normalizáló konstansokat elhagyva, hiszen csak az arányosságra fókuszálunk):
 $$P(p) \propto p^{\alpha-1} (1-p)^{\beta-1}$$
 
-3. **A Poszterior (A csoda):** Szorozzuk össze a kettőt!
+3. **Poszterior:** Szorozzuk össze a kettőt!
 $$P(p \mid \text{adat}) \propto \left( p^k (1-p)^{n-k} \right) \cdot \left( p^{\alpha-1} (1-p)^{\beta-1} \right)$$
 
 Vonjuk össze az azonos alapú hatványokat:
