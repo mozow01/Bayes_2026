@@ -20,9 +20,9 @@ BMETE91MC26	- Bayesiánus modellezés - 3 kredit - gyakorlat - félévközi jegy
 4. Szochasztikus jelenségek modellezése.
 5. Feltételes valószínűség Bayes- és Jeffrey-frissítés. 
 6. Prior és poszterior eloszlások, likelihood függvény, konjugált priorok, informatív és nem informatív priorok.
-7. Programozási gyakorlat
-8. ZH 
-9. Többváltozós valószínűségi eloszlások faktorizációja és a gráfmodell reprezentáció. Generatív modell.
+7. Többváltozós valószínűségi eloszlások faktorizációja és a gráfmodell reprezentáció. Generatív modell.
+8. Beadandó
+9. Beadandó
 10. Gyakorlati példák grafikus modellekre és ezek beprogramozása. Markov-lánc Monte Carlo eljárás és inferálási algoritmusok.
 11. Hierarchikus modellek. Bayes-féle adatelemzés, agymodellezés és pszichometrikus elemzés.
 12. Bayes-faktor és kiszámítása. Modell összehasonlítás és validáció.
