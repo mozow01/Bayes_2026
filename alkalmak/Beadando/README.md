@@ -667,7 +667,7 @@ A modellben háromféle dolgot érdemes külön nézni:
    - mekkora az egészséges modell valószínűsége,
    - mekkora a beteg modell valószínűsége,
    - mennyi a valódi súly becsült átlaga.
-6. A beadandó végén 4–6 mondatban értelmezd az eredményt.
+6. A beadandó végén 1–2 mondatban értelmezd az eredményt.
 
 ### Megadott alapprogram (WebPPL)
 
@@ -961,7 +961,7 @@ A modellben többféle bizonytalan mennyiség van:
    - mekkora az egyes modellek valószínűsége,
    - mennyi a valódi súly becsült átlaga,
    - mennyi a mérlegeltolás becsült átlaga.
-8. A beadandó végén 6–8 mondatban értelmezd az eredményt:
+8. A beadandó végén 1-2 mondatban értelmezd az eredményt:
    - inkább betegségre utalnak-e az adatok,
    - vagy inkább mérési hibára,
    - és miért.
