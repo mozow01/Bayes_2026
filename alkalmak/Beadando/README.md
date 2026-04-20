@@ -1,6 +1,4 @@
-# 1.
-
-## 1. Közepes feladat – Diszkalkuliás ítéletmodell
+## 1. Diszkalkuliás ítéletmodell
 
 Ebben a feladatban egy olyan ágenst vizsgálunk, amely egyszerű következtetéseket próbál megítélni, de a `csendes` és `cserfes` szavakat néha összekeveri.
 
@@ -232,7 +230,7 @@ print(pontossag(0.2));
 //
 // 4. Röviden értelmezd, mit mutatnak az eredmények.
 ```
-## 1. Nehezebb feladat – Kettős torzítású ágens
+## 2. Kettős torzítású ágens
 
 Ebben a feladatban egy olyan ágenst modellezünk, amelyik egyszerű következtetéseket próbál megítélni, de **kétféleképpen is hibázhat**.
 
@@ -617,9 +615,9 @@ print(pontossagEgyszeru(0.2))
 //    - és miért.
 //
 ```
-# 2.
 
-## 2. Közepes feladat – Bayes-féle modellösszevetés Csofival
+
+## 3. Bayes-féle modellezés Csofival
 
 Ebben a feladatban egy törpehörcsög, Csofi súlyát modellezzük.
 
@@ -903,7 +901,7 @@ print(atlagosSuly());
 //
 ```
 
-## 2. Nehezebb feladat – Beteg hörcsög vagy hibás mérleg?
+## 4. Beteg hörcsög vagy hibás mérleg?
 
 Ebben a feladatban tovább bővítjük a Csofi-modellt.
 
@@ -1249,13 +1247,11 @@ print(atlagosEltolas())
 //
 ```
 
-# 3. 
-
-## 3. Közepes feladat
+## 5.
 
 Írj programot, amelyik kiszámolja, hogy mi annak a valószínűsége, hogy 52 lapos francia kártyából 2 kártyát választva az egyik király, a másik nem király!
 
-## 3 Nehezebb feladat – Monty Hall kémmel
+## 6. Monty Hall kémmel
 
 Ebben a feladatban a klasszikus Monty Hall-probléma egy módosított változatát modellezzük.
 
@@ -1599,5 +1595,356 @@ print(pKemKovet(0.7))
 //    (c) Ha a kém a másik bent maradó ajtóra mutat,
 //        mely p értékektől érdemes inkább váltani,
 //        mint maradni?
+//
+```
+
+
+## 7. Két pénzérme: közös vagy külön paraméter?
+
+Ebben a feladatban két pénzérmét vizsgálunk.
+
+A megfigyelt adatok:
+
+- **A érme:** 10 dobásból 8 fej
+- **B érme:** 20 dobásból 16 fej
+
+A kérdés az, hogy a két érme viselkedését érdemes-e **közös** fejvalószínűséggel modellezni, vagy inkább **külön** paraméterrel.
+
+### A két modell
+
+**1. modell (közös paraméter):**
+
+- `p ~ Beta(1,1)`
+- mindkét érme ugyanazzal a `p` paraméterrel működik
+
+**2. modell (külön paraméterek):**
+
+- `pA ~ Beta(1,1)`
+- `pB ~ Beta(1,1)`
+- az A és a B érme külön paraméterrel működik
+
+### Feladatok
+
+1. Futtasd a megadott alapprogramot.
+2. Nézd meg a két modell poszterior valószínűségét.
+3. Nézd meg:
+   - a közös `p` poszteriorját az 1. modellben;
+   - `pA` és `pB` poszteriorját a 2. modellben.
+4. Nézd meg:
+   - az A érme következő 5 dobására adott prediktív eloszlást;
+   - a B érme következő 5 dobására adott prediktív eloszlást.
+5. Írj függvényeket a következő mennyiségekhez:
+   - `pKozosModell()`
+   - `pKulonModell()`
+   - `atlagKozoSP()`
+   - `atlagPA()`
+   - `atlagPB()`
+6. Írj még két függvényt:
+   - `pAlegalabb4FejKozoS()`
+   - `pBlegalabb4FejKulon()`
+7. Döntsd el, hogy a két modell közül melyiket támogatják jobban az adatok.
+
+### Döntési szabály
+
+A két modell prior valószínűsége legyen egyenlő.  
+Azt a modellt tekintjük jobban támogatottnak, amelyiknek nagyobb a **poszterior valószínűsége**.
+
+### Megadott alapprogram (WebPPL)
+
+```javascript
+// ------------------------------
+// 1. Adatok
+// ------------------------------
+
+var aDobas = 10
+var aFej = 8
+
+var bDobas = 20
+var bFej = 16
+
+
+// ------------------------------
+// 2. Segedfv.
+// ------------------------------
+
+var valoszinuseg = function(eloszlas, ertek) {
+  return Math.exp(eloszlas.score(ertek))
+}
+
+var atlagEloszlas = function(eloszlas) {
+  return expectation(eloszlas, function(x) { return x })
+}
+
+
+// ------------------------------
+// 3. 1. modell: kozos parameter
+// ------------------------------
+
+var kozosModell = function() {
+  var p = sample(Beta({a: 1, b: 1}))
+
+  observe(Binomial({n: aDobas, p: p}), aFej)
+  observe(Binomial({n: bDobas, p: p}), bFej)
+
+  return {
+    p: p,
+    aKov5: sample(Binomial({n: 5, p: p})),
+    bKov5: sample(Binomial({n: 5, p: p}))
+  }
+}
+
+
+// ------------------------------
+// 4. 2. modell: kulon parameterek
+// ------------------------------
+
+var kulonModell = function() {
+  var pA = sample(Beta({a: 1, b: 1}))
+  var pB = sample(Beta({a: 1, b: 1}))
+
+  observe(Binomial({n: aDobas, p: pA}), aFej)
+  observe(Binomial({n: bDobas, p: pB}), bFej)
+
+  return {
+    pA: pA,
+    pB: pB,
+    aKov5: sample(Binomial({n: 5, p: pA})),
+    bKov5: sample(Binomial({n: 5, p: pB}))
+  }
+}
+
+
+// ------------------------------
+// 5. Modellverseny
+// ------------------------------
+
+var teljesModell = function() {
+  var modell = categorical({
+    vs: [1, 2],
+    ps: [0.5, 0.5]
+  })
+
+  if (modell === 1) {
+    var p = sample(Beta({a: 1, b: 1}))
+
+    observe(Binomial({n: aDobas, p: p}), aFej)
+    observe(Binomial({n: bDobas, p: p}), bFej)
+
+    return 'kozos'
+  } else {
+    var pA = sample(Beta({a: 1, b: 1}))
+    var pB = sample(Beta({a: 1, b: 1}))
+
+    observe(Binomial({n: aDobas, p: pA}), aFej)
+    observe(Binomial({n: bDobas, p: pB}), bFej)
+
+    return 'kulon'
+  }
+}
+
+
+// ------------------------------
+// 6. Poszteriorok
+// ------------------------------
+
+var modellPoszterior = Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: teljesModell
+})
+
+var kozosPPoszterior = Infer({
+  method: 'MCMC',
+  samples: 4000,
+  burn: 1000,
+  lag: 2,
+  model: function() {
+    return kozosModell().p
+  }
+})
+
+var kulonPAPoszterior = Infer({
+  method: 'MCMC',
+  samples: 4000,
+  burn: 1000,
+  lag: 2,
+  model: function() {
+    return kulonModell().pA
+  }
+})
+
+var kulonPBPoszterior = Infer({
+  method: 'MCMC',
+  samples: 4000,
+  burn: 1000,
+  lag: 2,
+  model: function() {
+    return kulonModell().pB
+  }
+})
+
+var aKov5KozoS = Infer({
+  method: 'MCMC',
+  samples: 4000,
+  burn: 1000,
+  lag: 2,
+  model: function() {
+    return kozosModell().aKov5
+  }
+})
+
+var bKov5KozoS = Infer({
+  method: 'MCMC',
+  samples: 4000,
+  burn: 1000,
+  lag: 2,
+  model: function() {
+    return kozosModell().bKov5
+  }
+})
+
+var aKov5Kulon = Infer({
+  method: 'MCMC',
+  samples: 4000,
+  burn: 1000,
+  lag: 2,
+  model: function() {
+    return kulonModell().aKov5
+  }
+})
+
+var bKov5Kulon = Infer({
+  method: 'MCMC',
+  samples: 4000,
+  burn: 1000,
+  lag: 2,
+  model: function() {
+    return kulonModell().bKov5
+  }
+})
+
+
+// ------------------------------
+// 7. Mit ad vissza a modell?
+// ------------------------------
+
+viz(modellPoszterior)
+print('A modellek poszterior valoszinusege')
+
+viz(kozosPPoszterior)
+print('A kozos p poszteriorja')
+
+viz(kulonPAPoszterior)
+print('pA poszteriorja a kulon modellben')
+
+viz(kulonPBPoszterior)
+print('pB poszteriorja a kulon modellben')
+
+viz(aKov5KozoS)
+print('A erme: kovetkezo 5 dobas fejszama, kozos modell')
+
+viz(bKov5KozoS)
+print('B erme: kovetkezo 5 dobas fejszama, kozos modell')
+
+viz(aKov5Kulon)
+print('A erme: kovetkezo 5 dobas fejszama, kulon modell')
+
+viz(bKov5Kulon)
+print('B erme: kovetkezo 5 dobas fejszama, kulon modell')
+
+
+// ------------------------------
+// 8. Ezeket kell majd a hallgatoknak megirni
+// ------------------------------
+
+var pKozosModell = function() {
+  return valoszinuseg(modellPoszterior, 'kozos')
+}
+
+var pKulonModell = function() {
+  return valoszinuseg(modellPoszterior, 'kulon')
+}
+
+var atlagKozoSP = function() {
+  return atlagEloszlas(kozosPPoszterior)
+}
+
+var atlagPA = function() {
+  return atlagEloszlas(kulonPAPoszterior)
+}
+
+var atlagPB = function() {
+  return atlagEloszlas(kulonPBPoszterior)
+}
+
+
+// ------------------------------
+// 9. Mintafuttatas
+// ------------------------------
+
+print('A kozos modell poszterior valoszinusege:')
+print(pKozosModell())
+
+print('A kulon modell poszterior valoszinusege:')
+print(pKulonModell())
+
+print('A kozos p poszterior atlaga:')
+print(atlagKozoSP())
+
+print('pA poszterior atlaga:')
+print(atlagPA())
+
+print('pB poszterior atlaga:')
+print(atlagPB())
+
+
+// ------------------------------
+// 10. HALLGATOI FELADAT
+// ------------------------------
+//
+// 1. Futtasd a programot.
+//
+// 2. Nezd meg:
+//    - a modellek poszteriorjat,
+//    - a kozos p poszteriorjat,
+//    - a kulon modellben pA es pB poszteriorjat,
+//    - az A es a B erme kovetkezo 5 dobasara kapott
+//      prediktiv eloszlasokat.
+//
+// 3. Ellenorizd vagy egeszitsd ki a kovetkezo fv.-eket:
+//    - pKozosModell()
+//    - pKulonModell()
+//    - atlagKozoSP()
+//    - atlagPA()
+//    - atlagPB()
+//
+// 4. Ird meg a kovetkezo ket fv.-et:
+//
+//    - pAlegalabb4FejKozoS()
+//      Ez adja meg annak valoszinuseget, hogy
+//      az A erme kovetkezo 5 dobasaban legalabb 4 fej lesz,
+//      a KOZOS modellben.
+//
+//    - pBlegalabb4FejKulon()
+//      Ez adja meg annak valoszinuseget, hogy
+//      a B erme kovetkezo 5 dobasaban legalabb 4 fej lesz,
+//      a KULON modellben.
+//
+// 5. Irasd ki print segitsegevel:
+//
+//    - pKozosModell()
+//    - pKulonModell()
+//    - atlagKozoSP()
+//    - atlagPA()
+//    - atlagPB()
+//    - pAlegalabb4FejKozoS()
+//    - pBlegalabb4FejKulon()
+//
+// 6. Rogton ertekelheto rovid valasz:
+//    - a ket ermet inkabb kozos vagy kulon parameterrel
+//      erdemes modellezni?
+//    - mennyire kulonbozik pA es pB?
+//    - latszik-e erdemi kulonbseg a prediktiv eloszlasokban?
 //
 ```
