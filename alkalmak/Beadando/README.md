@@ -1248,3 +1248,356 @@ print(atlagosEltolas())
 //      hogy Csofi egészséges és a mérleg is jó.
 //
 ```
+
+# 3. 
+
+## 3. Közepes feladat
+
+Írj programot, amelyik kiszámolja, hogy mi annak a valószínűsége, hogy 52 lapos francia kártyából 2 kártyát választva az egyik király, a másik nem király!
+
+## 3 Nehezebb feladat – Monty Hall kémmel
+
+Ebben a feladatban a klasszikus Monty Hall-probléma egy módosított változatát modellezzük.
+
+### A modell lényege
+
+Három ajtó van:
+
+- az egyik mögött autó van,
+- a másik kettő mögött kecske.
+
+A játék menete:
+
+1. A játékos kiválaszt egy ajtót.
+2. Monty kinyit egy másik ajtót úgy, hogy:
+   - azt az ajtót a játékos nem választotta,
+   - és biztosan nincs mögötte autó.
+3. Ezután két csukott ajtó marad:
+   - a játékos eredeti ajtaja,
+   - és még egy másik csukott ajtó.
+4. Ekkor megjelenik egy kém, aki a két csukott ajtó egyikére mutat.
+   - `p` valószínűséggel a nyerő ajtóra mutat,
+   - `1-p` valószínűséggel a vesztes ajtóra mutat.
+
+### Mit jelent itt a kém tanácsa?
+
+A kém Monty ajtónyitása után csak a **két bent maradó csukott ajtó** egyikére mutat:
+
+- vagy a játékos eredeti ajtajára,
+- vagy a másik bent maradó ajtóra.
+
+### A vizsgált stratégiák
+
+Három stratégiát hasonlítunk össze:
+
+1. **Marad**  
+   A játékos mindig megtartja az eredeti választását.
+
+2. **Vált**  
+   A játékos mindig átmegy a másik bent maradó ajtóra, függetlenül attól, mit mutat a kém.
+
+3. **Követi a kémet**  
+   A játékos azt az ajtót választja, amelyikre a kém mutat.
+
+### A feladat célja
+
+A cél nem az, hogy kézzel számoljuk végig az eseteket, hanem az, hogy a helyzetet generatív modellként programozzuk le, és a modellből olvassuk ki:
+
+- a három stratégia nyerési valószínűségét,
+- valamint azt is, hogy a kém tanácsa után mikor érdemes maradni és mikor érdemes váltani.
+
+### Feladatok
+
+1. Futtasd a megadott alapprogramot.
+2. Írj egy `pMarad(p)` függvényt, amely megadja a **maradás** nyerési valószínűségét.
+3. Írj egy `pValt(p)` függvényt, amely megadja a **váltás** nyerési valószínűségét.
+4. Írj egy `pKemKovet(p)` függvényt, amely megadja a **kém követésének** nyerési valószínűségét.
+5. Írj egy `pEredetiJoHaKemSajatra(p)` függvényt, amely megadja annak valószínűségét, hogy az **eredeti választás** a nyerő ajtó, feltéve hogy a kém a játékos eredeti ajtajára mutatott.
+6. Írj egy `pMasikJoHaKemMasikra(p)` függvényt, amely megadja annak valószínűségét, hogy a **másik bent maradó ajtó** a nyerő, feltéve hogy a kém a másik bent maradó ajtóra mutatott.
+7. `print` segítségével készíts táblázatot a következő `p` értékekre:
+   - `0`
+   - `0.1`
+   - `0.2`
+   - `0.3`
+   - `0.4`
+   - `0.5`
+   - `0.6`
+   - `0.7`
+   - `0.8`
+   - `0.9`
+   - `1.0`
+8. Minden `p` értéknél írass ki:
+   - `pMarad(p)`
+   - `pValt(p)`
+   - `pKemKovet(p)`
+   - `pEredetiJoHaKemSajatra(p)`
+   - `pMasikJoHaKemMasikra(p)`
+9. A beadandó végén röviden válaszolj az alábbi kérdésekre:
+   - Melyik `p` értéknél lesz a **kém követése** jobb stratégia, mint a **mindig váltás**?
+   - Ha a kém a **saját eredeti ajtódra** mutat, mely `p` értékektől érdemes inkább **maradni**, mint váltani?
+   - Ha a kém a **másik bent maradó ajtóra** mutat, mely `p` értékektől érdemes inkább **váltani**, mint maradni?
+
+### Megadott alapprogram (WebPPL)
+
+```javascript
+// ------------------------------
+// 1. Alapadatok
+// ------------------------------
+
+var ajtok = [1, 2, 3]
+
+
+// ------------------------------
+// 2. Segédfüggvények
+// ------------------------------
+
+var veletlenAjto = function() {
+  return uniformDraw(ajtok)
+}
+
+var ajtoSzoveg = function(a) {
+  return 'ajtó ' + a
+}
+
+var maradoAjtok = function(valasztas, monty) {
+  return filter(function(a) {
+    return (a !== valasztas) && (a !== monty)
+  }, ajtok)
+}
+
+
+// ------------------------------
+// 3. Monty lépése
+// ------------------------------
+
+var montyNyithat = function(valasztas, nyeroAjto) {
+  return filter(function(a) {
+    return (a !== valasztas) && (a !== nyeroAjto)
+  }, ajtok)
+}
+
+var montyNyit = function(valasztas, nyeroAjto) {
+  return uniformDraw(montyNyithat(valasztas, nyeroAjto))
+}
+
+
+// ------------------------------
+// 4. A másik bent maradó ajtó
+// ------------------------------
+
+var masikBentMaradoAjto = function(valasztas, monty) {
+  return uniformDraw(maradoAjtok(valasztas, monty))
+}
+
+
+// ------------------------------
+// 5. A kém tanácsa
+// ------------------------------
+
+var kemMutat = function(valasztas, masikAjto, nyeroAjto, p) {
+  var nyeroBentMaradoAjto =
+    (valasztas === nyeroAjto) ? valasztas : masikAjto
+
+  var vesztesBentMaradoAjto =
+    (valasztas === nyeroAjto) ? masikAjto : valasztas
+
+  return flip(p) ? nyeroBentMaradoAjto : vesztesBentMaradoAjto
+}
+
+
+// ------------------------------
+// 6. Egyetlen játék
+// ------------------------------
+
+var egyJatek = function(p) {
+  var nyeroAjto = veletlenAjto()
+  var valasztas = veletlenAjto()
+  var monty = montyNyit(valasztas, nyeroAjto)
+  var masikAjto = masikBentMaradoAjto(valasztas, monty)
+  var kemAjto = kemMutat(valasztas, masikAjto, nyeroAjto, p)
+
+  return {
+    nyeroAjto: nyeroAjto,
+    valasztas: valasztas,
+    monty: monty,
+    masikAjto: masikAjto,
+    kemAjto: kemAjto,
+
+    kemSajatAjtoraMutat: kemAjto === valasztas,
+    kemMasikAjtoraMutat: kemAjto === masikAjto,
+
+    maradNyer: valasztas === nyeroAjto,
+    valtNyer: masikAjto === nyeroAjto,
+    kemetKovetNyer: kemAjto === nyeroAjto
+  }
+}
+
+
+// ------------------------------
+// 7. Mit ad vissza a modell?
+// ------------------------------
+
+// A klasszikus helyzet: az eredeti választás jó-e?
+viz(Infer({
+  method: 'enumerate',
+  model: function() {
+    var j = egyJatek(0.7)
+    return j.maradNyer ? 'az eredeti választás nyerő' : 'az eredeti választás nem nyerő'
+  }
+}))
+print('A klasszikus Monty Hall-helyzet az eredeti választásról')
+
+// A kém milyen gyakran mutat a saját ajtóra / a másik ajtóra?
+viz(Infer({
+  method: 'enumerate',
+  model: function() {
+    var j = egyJatek(0.7)
+    return j.kemSajatAjtoraMutat ? 'a kém a saját ajtóra mutat' : 'a kém a másik ajtóra mutat'
+  }
+}))
+print('A kém mutatása p = 0.7 mellett')
+
+// Együtt is nézzük: hová mutat a kém, és jó volt-e az eredeti választás?
+viz(Infer({
+  method: 'enumerate',
+  model: function() {
+    var j = egyJatek(0.7)
+    var kemSzoveg = j.kemSajatAjtoraMutat ? 'kém: saját ajtó' : 'kém: másik ajtó'
+    var eredetiSzoveg = j.maradNyer ? 'eredeti választás: nyerő' : 'eredeti választás: vesztes'
+    return kemSzoveg + ' | ' + eredetiSzoveg
+  }
+}))
+print('A kém jelzése és az eredeti választás viszonya p = 0.7 mellett')
+
+// Maradási stratégia eredménye
+viz(Infer({
+  method: 'enumerate',
+  model: function() {
+    var j = egyJatek(0.7)
+    return j.maradNyer ? 'maradással nyer' : 'maradással veszít'
+  }
+}))
+print('Maradási stratégia p = 0.7 mellett')
+
+// Váltási stratégia eredménye
+viz(Infer({
+  method: 'enumerate',
+  model: function() {
+    var j = egyJatek(0.7)
+    return j.valtNyer ? 'váltással nyer' : 'váltással veszít'
+  }
+}))
+print('Váltási stratégia p = 0.7 mellett')
+
+// Kém követése
+viz(Infer({
+  method: 'enumerate',
+  model: function() {
+    var j = egyJatek(0.7)
+    return j.kemetKovetNyer ? 'a kémet követve nyer' : 'a kémet követve veszít'
+  }
+}))
+print('Kémkövető stratégia p = 0.7 mellett')
+
+
+// ------------------------------
+// 8. Segédfüggvények
+// ------------------------------
+
+var igazValoszinuseg = function(eloszlas) {
+  return Math.exp(eloszlas.score(true))
+}
+
+
+// ------------------------------
+// 9. Ezeket kell majd a hallgatóknak megírni
+// ------------------------------
+
+// A maradás nyerési valószínűsége
+var pMarad = function(p) {
+  var eloszlas = Infer({
+    method: 'enumerate',
+    model: function() {
+      return egyJatek(p).maradNyer
+    }
+  })
+
+  return igazValoszinuseg(eloszlas)
+}
+
+// A váltás nyerési valószínűsége
+var pValt = function(p) {
+  var eloszlas = Infer({
+    method: 'enumerate',
+    model: function() {
+      return egyJatek(p).valtNyer
+    }
+  })
+
+  return igazValoszinuseg(eloszlas)
+}
+
+// A kém követésének nyerési valószínűsége
+var pKemKovet = function(p) {
+  var eloszlas = Infer({
+    method: 'enumerate',
+    model: function() {
+      return egyJatek(p).kemetKovetNyer
+    }
+  })
+
+  return igazValoszinuseg(eloszlas)
+}
+
+
+// ------------------------------
+// 10. Minta futtatás
+// ------------------------------
+
+print('pMarad(0.7):')
+print(pMarad(0.7))
+
+print('pValt(0.7):')
+print(pValt(0.7))
+
+print('pKemKovet(0.7):')
+print(pKemKovet(0.7))
+
+
+// ------------------------------
+// 11. HALLGATÓI FELADAT
+// ------------------------------
+//
+// 1. Írd meg a pEredetiJoHaKemSajatra(p) függvényt.
+//    Ez azt adja meg, hogy mekkora annak a valószínűsége,
+//    hogy az EREDETI választás a nyerő ajtó,
+//    feltéve hogy a kém a SAJÁT eredeti ajtóra mutatott.
+//
+// 2. Írd meg a pMasikJoHaKemMasikra(p) függvényt.
+//    Ez azt adja meg, hogy mekkora annak a valószínűsége,
+//    hogy a MÁSIK bent maradó ajtó a nyerő,
+//    feltéve hogy a kém a MÁSIK bent maradó ajtóra mutatott.
+//
+// 3. Írasd ki print segítségével a következő p értékekre:
+//    0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
+//
+//    - pMarad(p)
+//    - pValt(p)
+//    - pKemKovet(p)
+//    - pEredetiJoHaKemSajatra(p)
+//    - pMasikJoHaKemMasikra(p)
+//
+// 4. Röviden értelmezd:
+//
+//    (a) Melyik p értéknél lesz a kém követése jobb,
+//        mint a mindig váltás?
+//
+//    (b) Ha a kém a saját eredeti ajtódra mutat,
+//        mely p értékektől érdemes inkább maradni,
+//        mint váltani?
+//
+//    (c) Ha a kém a másik bent maradó ajtóra mutat,
+//        mely p értékektől érdemes inkább váltani,
+//        mint maradni?
+//
+```
