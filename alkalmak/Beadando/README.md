@@ -617,3 +617,634 @@ print(pontossagEgyszeru(0.2))
 //    - és miért.
 //
 ```
+# 2.
+
+## 2. Közepes feladat – Bayes-féle modellösszevetés Csofival
+
+Ebben a feladatban egy törpehörcsög, Csofi súlyát modellezzük.
+
+### A modell lényege
+
+Két lehetséges magyarázatunk van:
+
+- **1. modell:** Csofi egészséges  
+- **2. modell:** Csofi beteg
+
+A két modellhez a következő feltevéseket használjuk:
+
+- ha Csofi egészséges, akkor a valódi súlya egy `Gauss(22,1)` eloszlásból jön;
+- ha Csofi beteg, akkor a valódi súlya egy `Gauss(17,1)` eloszlásból jön.
+
+A mérések:
+
+- `19`
+- `18`
+- `18`
+
+A cél az, hogy a mért adatok alapján eldöntsük, melyik modell valószínűbb. Ez közvetlenül a 2026-os 2. alkalom Csofi-példájára épül. :contentReference[oaicite:2]{index=2}
+
+### Mit jelent itt a modell?
+
+A modellben háromféle dolgot érdemes külön nézni:
+
+1. **Melyik modellt választotta a világ?**  
+   Ez egy diszkrét változó: `1 = egészséges`, `2 = beteg`.
+
+2. **Mennyi Csofi valódi súlya?**  
+   Ez egy folytonos, bizonytalan mennyiség.
+
+3. **Mi lehet a következő mérés eredménye?**  
+   Ez is egy eloszlás lesz, mert a mérés zajos.
+
+### Feladatok
+
+1. Futtasd a megadott alapprogramot.
+2. Írj egy `pEgeszseges()` függvényt, amely megadja az egészséges modell poszterior valószínűségét.
+3. Írj egy `pBeteg()` függvényt, amely megadja a beteg modell poszterior valószínűségét.
+4. Írj egy `atlagosSuly()` függvényt, amely a valódi súly poszterior várható értékét adja meg.
+5. Készíts egy rövid szöveges összefoglalót a futás végén `print` segítségével:
+   - melyik modell lett valószínűbb,
+   - mekkora az egészséges modell valószínűsége,
+   - mekkora a beteg modell valószínűsége,
+   - mennyi a valódi súly becsült átlaga.
+6. A beadandó végén 4–6 mondatban értelmezd az eredményt.
+
+### Megadott alapprogram (WebPPL)
+
+```javascript
+// ------------------------------
+// 1. Adatok
+// ------------------------------
+
+var meresek = [19, 18, 18];
+
+// 1 = egészséges, 2 = beteg
+var modellNevek = function(i) {
+  return i === 1 ? 'egészséges' : 'beteg';
+};
+
+
+// ------------------------------
+// 2. Prior modellek külön
+// ------------------------------
+
+// Egészséges modell priorja
+var priorEgeszseges = Infer({
+  method: 'forward',
+  samples: 4000,
+  model: function() {
+    var suly = gaussian(22, 1);
+    return {modell: 'egészséges', suly: suly};
+  }
+});
+
+// Beteg modell priorja
+var priorBeteg = Infer({
+  method: 'forward',
+  samples: 4000,
+  model: function() {
+    var suly = gaussian(17, 1);
+    return {modell: 'beteg', suly: suly};
+  }
+});
+
+viz(priorEgeszseges);
+print('Egészséges prior: a valódi súly eloszlása');
+
+viz(priorBeteg);
+print('Beteg prior: a valódi súly eloszlása');
+
+
+// ------------------------------
+// 3. A teljes Bayes-modell
+// ------------------------------
+
+var teljesModell = function() {
+  // Kezdetben 50-50% esélyt adunk a két modellnek
+  var modell = categorical({
+    vs: [1, 2],
+    ps: [0.5, 0.5]
+  });
+
+  // A választott modellhez tartozó valódi súly
+  var suly = (modell === 1) ? gaussian(22, 1) : gaussian(17, 1);
+
+  // A mérések zajos megfigyelések a valódi súly körül
+  map(function(x) {
+    observe(Gaussian({mu: suly, sigma: 1}), x);
+  }, meresek);
+
+  // Következő mérés predikciója
+  var kovetkezoMeres = sample(Gaussian({mu: suly, sigma: 1}));
+
+  return {
+    modell: modellNevek(modell),
+    suly: suly,
+    kovetkezoMeres: kovetkezoMeres
+  };
+};
+
+
+// ------------------------------
+// 4. Poszterior inferencia
+// ------------------------------
+
+var poszterior = Infer({
+  method: 'SMC',
+  particles: 3000,
+  rejuvSteps: 5,
+  model: teljesModell
+});
+
+
+// ------------------------------
+// 5. Mit ad vissza a modell?
+// ------------------------------
+
+// A modellválasztás poszteriorja
+viz(Infer({
+  method: 'SMC',
+  particles: 3000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().modell;
+  }
+}));
+print('Poszterior a modellekre');
+
+// A valódi súly poszteriorja
+viz(Infer({
+  method: 'SMC',
+  particles: 3000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().suly;
+  }
+}));
+print('Poszterior a valódi súlyra');
+
+// A következő mérés prediktív eloszlása
+viz(Infer({
+  method: 'SMC',
+  particles: 3000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().kovetkezoMeres;
+  }
+}));
+print('Prediktív eloszlás a következő mérésre');
+
+
+// ------------------------------
+// 6. Segédfüggvények
+// ------------------------------
+
+// Diszkrét eloszlásból egy konkrét érték valószínűsége
+var valoszinuseg = function(eloszlas, ertek) {
+  return Math.exp(eloszlas.score(ertek));
+};
+
+// Egyszerű átlag egy mintából
+var atlag = function(lista) {
+  return sum(lista) / lista.length;
+};
+
+
+// ------------------------------
+// 7. Ezt kell majd a hallgatóknak megírni
+// ------------------------------
+
+// Poszterior a modellre
+var modellPoszterior = Infer({
+  method: 'SMC',
+  particles: 3000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().modell;
+  }
+});
+
+// Poszterior a valódi súlyra
+var sulyPoszterior = Infer({
+  method: 'SMC',
+  particles: 3000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().suly;
+  }
+});
+
+// Az egészséges modell poszterior valószínűsége
+var pEgeszseges = function() {
+  return valoszinuseg(modellPoszterior, 'egészséges');
+};
+
+// A beteg modell poszterior valószínűsége
+var pBeteg = function() {
+  return valoszinuseg(modellPoszterior, 'beteg');
+};
+
+// A valódi súly poszterior várható értékének közelítése mintavétellel
+var atlagosSuly = function() {
+  var mintak = sample(sulyPoszterior, 3000);
+  return atlag(mintak);
+};
+
+
+// ------------------------------
+// 8. Minta futtatás
+// ------------------------------
+
+print('A mért adatok:');
+print(meresek);
+
+print('A mért adatok átlaga:');
+print(atlag(meresek));
+
+print('Egészséges modell poszterior valószínűsége:');
+print(pEgeszseges());
+
+print('Beteg modell poszterior valószínűsége:');
+print(pBeteg());
+
+print('A valódi súly becsült poszterior átlaga:');
+print(atlagosSuly());
+
+
+// ------------------------------
+// 9. HALLGATÓI FELADAT
+// ------------------------------
+//
+// 1. Futtasd a programot.
+//
+// 2. Ellenőrizd, hogy a priorokból tényleg az látszik-e,
+//    amit a modell állít:
+//    - az egészséges állat súlya 22 körül van,
+//    - a beteg állat súlya 17 körül van.
+//
+// 3. Nézd meg a modellPoszterior eloszlást,
+//    és döntsd el, melyik modell lett valószínűbb.
+//
+// 4. Írd meg vagy egészítsd ki a következő függvényeket:
+//    - pEgeszseges()
+//    - pBeteg()
+//    - atlagosSuly()
+//
+// 5. A futás végén írd ki print segítségével:
+//    - pEgeszseges()
+//    - pBeteg()
+//    - atlagosSuly()
+//
+// 6. Röviden értelmezd az eredményt:
+//    - melyik modell nyert,
+//    - mennyire egyértelmű a döntés,
+//    - hogyan viszonyul a becsült valódi súly
+//      a 22 g-os és a 17 g-os feltevéshez.
+//
+```
+
+## 2. Nehezebb feladat – Beteg hörcsög vagy hibás mérleg?
+
+Ebben a feladatban tovább bővítjük a Csofi-modellt.
+
+### A modell lényege
+
+Három lehetséges magyarázatunk van a mért adatokra:
+
+- **1. modell:** Csofi egészséges, és a mérleg jól mér.
+- **2. modell:** Csofi beteg, és a mérleg jól mér.
+- **3. modell:** Csofi egészséges, de a mérleg lefelé csal.
+
+A három modellhez a következő feltevéseket használjuk:
+
+- ha Csofi **egészséges**, akkor a valódi súlya `Gauss(22,1)` eloszlásból jön;
+- ha Csofi **beteg**, akkor a valódi súlya `Gauss(17,1)` eloszlásból jön;
+- ha a mérleg **lefelé csal**, akkor van egy `eltolas` paraméter, amely `Gauss(-3,0.5)` eloszlásból jön.
+
+A mérési modell:
+
+- minden mérés a `valodiSuly + eltolas` körül ingadozik, `sigma = 1` szórással.
+
+A mérések:
+
+- `19`
+- `18`
+- `18`
+
+### Mit érdemes külön nézni?
+
+A modellben többféle bizonytalan mennyiség van:
+
+1. **Melyik modell igaz?**
+   - egészséges
+   - beteg
+   - hibás mérleg
+
+2. **Mennyi Csofi valódi súlya?**
+
+3. **Mekkora a mérleg eltolása?**
+   - az első két modellben ez `0`
+   - a harmadik modellben ez általában negatív
+
+4. **Mi lehet a következő mérés eredménye?**
+
+### Feladatok
+
+1. Futtasd a megadott alapprogramot.
+2. Írj egy `pEgeszsegesJol()` függvényt, amely megadja az 1. modell poszterior valószínűségét.
+3. Írj egy `pBetegJol()` függvényt, amely megadja a 2. modell poszterior valószínűségét.
+4. Írj egy `pHibasMerleg()` függvényt, amely megadja a 3. modell poszterior valószínűségét.
+5. Írj egy `atlagosSuly()` függvényt, amely a valódi súly poszterior várható értékét adja meg.
+6. Írj egy `atlagosEltolas()` függvényt, amely a mérlegeltolás poszterior várható értékét adja meg.
+7. A futás végén írass ki `print` segítségével egy rövid összefoglalót:
+   - melyik modell a legvalószínűbb,
+   - mekkora az egyes modellek valószínűsége,
+   - mennyi a valódi súly becsült átlaga,
+   - mennyi a mérlegeltolás becsült átlaga.
+8. A beadandó végén 6–8 mondatban értelmezd az eredményt:
+   - inkább betegségre utalnak-e az adatok,
+   - vagy inkább mérési hibára,
+   - és miért.
+
+### Megadott alapprogram (WebPPL)
+
+```javascript
+// ------------------------------
+// 1. Adatok
+// ------------------------------
+
+var meresek = [19, 18, 18]
+
+
+// ------------------------------
+// 2. A modellek nevei
+// ------------------------------
+
+var modellNev = function(m) {
+  if (m === 1) {
+    return 'egeszseges_es_jol_mer'
+  } else if (m === 2) {
+    return 'beteg_es_jol_mer'
+  } else {
+    return 'egeszseges_de_hibas_merleg'
+  }
+}
+
+
+// ------------------------------
+// 3. Priorok külön megmutatva
+// ------------------------------
+
+// Egészséges állat prior súlya
+viz(Infer({
+  method: 'forward',
+  samples: 4000,
+  model: function() {
+    return gaussian(22, 1)
+  }
+}))
+print('Prior a valódi súlyra, ha Csofi egészséges')
+
+// Beteg állat prior súlya
+viz(Infer({
+  method: 'forward',
+  samples: 4000,
+  model: function() {
+    return gaussian(17, 1)
+  }
+}))
+print('Prior a valódi súlyra, ha Csofi beteg')
+
+// Hibás mérleg prior eltérése
+viz(Infer({
+  method: 'forward',
+  samples: 4000,
+  model: function() {
+    return gaussian(-3, 0.5)
+  }
+}))
+print('Prior a mérleg eltolására, ha a mérleg lefelé csal')
+
+
+// ------------------------------
+// 4. A teljes Bayes-modell
+// ------------------------------
+
+var teljesModell = function() {
+  // Kezdetben mindhárom modell egyformán valószínű
+  var modell = categorical({
+    vs: [1, 2, 3],
+    ps: [1/3, 1/3, 1/3]
+  })
+
+  // Valódi súly
+  var valodiSuly =
+    (modell === 1) ? gaussian(22, 1) :
+    (modell === 2) ? gaussian(17, 1) :
+                     gaussian(22, 1)
+
+  // Mérlegeltolás
+  var eltolas =
+    (modell === 3) ? gaussian(-3, 0.5) : 0
+
+  // Megfigyelt mérések
+  map(function(x) {
+    observe(Gaussian({mu: valodiSuly + eltolas, sigma: 1}), x)
+  }, meresek)
+
+  // Következő mérés predikciója
+  var kovetkezoMeres = sample(Gaussian({mu: valodiSuly + eltolas, sigma: 1}))
+
+  return {
+    modell: modellNev(modell),
+    valodiSuly: valodiSuly,
+    eltolas: eltolas,
+    kovetkezoMeres: kovetkezoMeres
+  }
+}
+
+
+// ------------------------------
+// 5. Mit ad vissza a modell?
+// ------------------------------
+
+// A modellválasztás poszteriorja
+viz(Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().modell
+  }
+}))
+print('Poszterior a modellekre')
+
+// A valódi súly poszteriorja
+viz(Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().valodiSuly
+  }
+}))
+print('Poszterior a valódi súlyra')
+
+// A mérlegeltolás poszteriorja
+viz(Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().eltolas
+  }
+}))
+print('Poszterior a mérleg eltolására')
+
+// A következő mérés prediktív eloszlása
+viz(Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().kovetkezoMeres
+  }
+}))
+print('Prediktív eloszlás a következő mérésre')
+
+
+// ------------------------------
+// 6. Segédfüggvények
+// ------------------------------
+
+// Diszkrét eloszlásból egy adott érték valószínűsége
+var valoszinuseg = function(eloszlas, ertek) {
+  return Math.exp(eloszlas.score(ertek))
+}
+
+// Eloszlás várható értéke
+var atlagEloszlas = function(eloszlas) {
+  return expectation(eloszlas, function(x) { return x })
+}
+
+
+// ------------------------------
+// 7. Poszterior eloszlások
+// ------------------------------
+
+var modellPoszterior = Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().modell
+  }
+})
+
+var sulyPoszterior = Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().valodiSuly
+  }
+})
+
+var eltolasPoszterior = Infer({
+  method: 'SMC',
+  particles: 4000,
+  rejuvSteps: 5,
+  model: function() {
+    return teljesModell().eltolas
+  }
+})
+
+
+// ------------------------------
+// 8. Ezt kell majd a hallgatóknak megírni
+// ------------------------------
+
+// 1. modell: egészséges és jól mér
+var pEgeszsegesJol = function() {
+  return valoszinuseg(modellPoszterior, 'egeszseges_es_jol_mer')
+}
+
+// 2. modell: beteg és jól mér
+var pBetegJol = function() {
+  return valoszinuseg(modellPoszterior, 'beteg_es_jol_mer')
+}
+
+// 3. modell: egészséges, de hibás a mérleg
+var pHibasMerleg = function() {
+  return valoszinuseg(modellPoszterior, 'egeszseges_de_hibas_merleg')
+}
+
+// A valódi súly poszterior várható értéke
+var atlagosSuly = function() {
+  return atlagEloszlas(sulyPoszterior)
+}
+
+// A mérlegeltolás poszterior várható értéke
+var atlagosEltolas = function() {
+  return atlagEloszlas(eltolasPoszterior)
+}
+
+
+// ------------------------------
+// 9. Minta futtatás
+// ------------------------------
+
+print('A mért adatok:')
+print(meresek)
+
+print('Az 1. modell valószínűsége (egészséges és jól mér):')
+print(pEgeszsegesJol())
+
+print('A 2. modell valószínűsége (beteg és jól mér):')
+print(pBetegJol())
+
+print('A 3. modell valószínűsége (egészséges, de hibás mérleg):')
+print(pHibasMerleg())
+
+print('A valódi súly becsült poszterior átlaga:')
+print(atlagosSuly())
+
+print('A mérlegeltolás becsült poszterior átlaga:')
+print(atlagosEltolas())
+
+
+// ------------------------------
+// 10. HALLGATÓI FELADAT
+// ------------------------------
+//
+// 1. Futtasd a programot.
+//
+// 2. Nézd meg a priorokat:
+//    - egészséges állat súlya,
+//    - beteg állat súlya,
+//    - hibás mérleg eltolása.
+//
+// 3. Nézd meg a modellPoszterior eloszlást,
+//    és döntsd el, melyik modell lett a legvalószínűbb.
+//
+// 4. Írd meg vagy ellenőrizd a következő függvényeket:
+//    - pEgeszsegesJol()
+//    - pBetegJol()
+//    - pHibasMerleg()
+//    - atlagosSuly()
+//    - atlagosEltolas()
+//
+// 5. A futás végén írd ki print segítségével:
+//    - pEgeszsegesJol()
+//    - pBetegJol()
+//    - pHibasMerleg()
+//    - atlagosSuly()
+//    - atlagosEltolas()
+//
+// 6. Röviden értelmezd az eredményt:
+//    - az adatok inkább betegséget támogatnak-e,
+//    - vagy inkább hibás mérleget,
+//    - és mennyire marad esélye annak,
+//      hogy Csofi egészséges és a mérleg is jó.
+//
+```
