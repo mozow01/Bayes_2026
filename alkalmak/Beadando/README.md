@@ -52,16 +52,15 @@ var foglalkozasok = ['könyvtáros', 'tanár'];
 var tulajdonsagok = ['csendes', 'cserfes'];
 var kapcsolatok = ['és', 'vagy'];
 
-
 // ------------------------------
 // 2. Segédfüggvények
 // ------------------------------
 
 // q valószínűséggel felcseréli a csendes/cserfes szót
 var csereTulajdonsag = function(szo, q) {
-  return flip(q)
-    ? (szo === 'csendes' ? 'cserfes' : 'csendes')
-    : szo;
+  return flip(q) ? 
+    (szo === 'csendes' ? 'cserfes' : 'csendes') : 
+    szo;
 };
 
 // Véletlen feladat generálása
@@ -86,7 +85,6 @@ var iteletSzoveg = function(x) {
   return x ? 'érvényes' : 'nem érvényes';
 };
 
-
 // ------------------------------
 // 3. Helyes logikai ítélet
 // ------------------------------
@@ -99,25 +97,20 @@ var logikaSzerint = function(f) {
   }
 };
 
-
 // ------------------------------
 // 4. A diszkalkuliás ágens ítélete
 // ------------------------------
 
 var agensSzerint = function(f, q) {
-  var belsoPremisszaTulajdonsag =
-    csereTulajdonsag(f.premisszaTulajdonsag, q);
-
-  var belsoKonkluzioTulajdonsag =
-    csereTulajdonsag(f.konkluzioTulajdonsag, q);
+  var belsoPremissza = csereTulajdonsag(f.premisszaTulajdonsag, q);
+  var belsoKonkluzio = csereTulajdonsag(f.konkluzioTulajdonsag, q);
 
   if (f.kapcsolat === 'és') {
-    return belsoPremisszaTulajdonsag === belsoKonkluzioTulajdonsag;
+    return belsoPremissza === belsoKonkluzio;
   } else {
     return false;
   }
 };
-
 
 // ------------------------------
 // 5. Egyetlen futás részletesen
@@ -126,21 +119,14 @@ var agensSzerint = function(f, q) {
 var egyFutas = function(q) {
   var f = sorsolFeladat();
 
-  var belsoPremisszaTulajdonsag =
-    csereTulajdonsag(f.premisszaTulajdonsag, q);
-
-  var belsoKonkluzioTulajdonsag =
-    csereTulajdonsag(f.konkluzioTulajdonsag, q);
+  var belsoPremissza = csereTulajdonsag(f.premisszaTulajdonsag, q);
+  var belsoKonkluzio = csereTulajdonsag(f.konkluzioTulajdonsag, q);
 
   var helyesItelet = logikaSzerint(f);
 
-  var agensItelet;
-  if (f.kapcsolat === 'és') {
-    agensItelet =
-      belsoPremisszaTulajdonsag === belsoKonkluzioTulajdonsag;
-  } else {
-    agensItelet = false;
-  }
+  var agensItelet = (f.kapcsolat === 'és') ?
+    (belsoPremissza === belsoKonkluzio) :
+    false;
 
   var joValasz = (helyesItelet === agensItelet);
 
@@ -148,14 +134,12 @@ var egyFutas = function(q) {
     feladat: feladatSzoveg(f),
     agensFejeben:
       'Panni ' + f.foglalkozas + ' ' + f.kapcsolat + ' ' +
-      belsoPremisszaTulajdonsag + '. Tehát Panni ' +
-      belsoKonkluzioTulajdonsag + '.',
+      belsoPremissza + '. Tehát Panni ' + belsoKonkluzio + '.',
     logika: iteletSzoveg(helyesItelet),
     agens: iteletSzoveg(agensItelet),
     joValasz: joValasz
   };
 };
-
 
 // ------------------------------
 // 6. Mit ad vissza a modell?
@@ -194,7 +178,6 @@ viz(Infer({
   }
 }));
 
-
 // ------------------------------
 // 7. Segédfüggvény egy szám kiolvasásához
 // ------------------------------
@@ -202,7 +185,6 @@ viz(Infer({
 var igazValoszinuseg = function(eloszlas) {
   return Math.exp(eloszlas.score(true));
 };
-
 
 // ------------------------------
 // 8. Ezt kell majd a hallgatóknak megírni
@@ -220,14 +202,12 @@ var pontossag = function(q) {
   return igazValoszinuseg(eloszlas);
 };
 
-
 // ------------------------------
 // 9. Minta futtatás
 // ------------------------------
 
 print('Összesített pontosság q = 0.2 esetén:');
 print(pontossag(0.2));
-
 
 // ------------------------------
 // 10. HALLGATÓI FELADAT
@@ -249,5 +229,4 @@ print(pontossag(0.2));
 //    - pontossagVagy(q)
 //
 // 4. Röviden értelmezd, mit mutatnak az eredmények.
-//
 ```
