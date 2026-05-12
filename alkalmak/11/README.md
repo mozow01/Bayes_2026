@@ -4,13 +4,13 @@
 
 A bayesi modell-összehasonlítás célja annak eldöntése, hogy két vagy több modell közül melyik magyarázza jobban a megfigyelt adatokat.
 
-Ezt úgy is megfogalmazhatjuk, hogy építünk egy nagyobb, hierarchikus modellt, amelyben maga a modellválasztás is egy valószínűségi változó. Jelöljük ezt \(m\)-mel. Ekkor \(m\) mondja meg, hogy éppen melyik modellt használjuk. Az adott modellhez tartozó látens paramétereket jelöljük \(\vartheta\)-val, a megfigyelt adatot pedig \(D\)-vel.
+Ezt úgy is megfogalmazhatjuk, hogy építünk egy nagyobb, hierarchikus modellt, amelyben maga a modellválasztás is egy valószínűségi változó. Jelöljük ezt $m$-mel. Ekkor $m$ mondja meg, hogy éppen melyik modellt használjuk. Az adott modellhez tartozó látens paramétereket jelöljük $\vartheta$-val, a megfigyelt adatot pedig $D$-vel.
 
 Vagyis a teljes modellben három fontos komponens szerepel:
 
-- \(m\): a modellindex, például \(m_1\) vagy \(m_2\),
-- \(\vartheta\): az adott modell látens paramétere,
-- \(D\): a megfigyelt adat.
+- $m$: a modellindex, például $m_1$ vagy $m_2$,
+- $\vartheta$: az adott modell látens paramétere,
+- $D$: a megfigyelt adat.
 
 A modell-összehasonlításban nem az a kérdés, hogy egyetlen paraméterérték mellett mennyire valószínű az adat. Hanem az, hogy az egész modell, a saját priorjával együtt, mennyire jól jósolja az adatot.
 
@@ -28,21 +28,21 @@ A Bayes-faktor definíciója:
 
 $$BF_{12}=\frac{\Pr(D\mid m_1)}{\Pr(D\mid m_2)}.$$
 
-Ez azt méri, hogy az adat hányszor valószínűbb az \(m_1\) modellben, mint az \(m_2\) modellben.
+Ez azt méri, hogy az adat hányszor valószínűbb az $m_1$ modellben, mint az $m_2$ modellben.
 
-- Ha \(BF_{12}>1\), akkor az adat inkább \(m_1\)-et támogatja.
-- Ha \(BF_{12}<1\), akkor az adat inkább \(m_2\)-t támogatja.
-- Ha \(BF_{12}=1\), akkor az adat a két modellt egyformán támogatja.
+- Ha $BF_{12}>1$, akkor az adat inkább $m_1$-et támogatja.
+- Ha $BF_{12}<1$, akkor az adat inkább $m_2$-t támogatja.
+- Ha $BF_{12}=1$, akkor az adat a két modellt egyformán támogatja.
 
 Nagyon fontos, hogy mindig figyeljük az indexek sorrendjét. Ha ezt számoljuk:
 
 $$BF_{12}=\frac{\Pr(D\mid m_1)}{\Pr(D\mid m_2)},$$
 
-akkor a nagy érték \(m_1\)-et támogatja. Ha viszont ezt számoljuk:
+akkor a nagy érték $m_1$-et támogatja. Ha viszont ezt számoljuk:
 
 $$BF_{21}=\frac{\Pr(D\mid m_2)}{\Pr(D\mid m_1)},$$
 
-akkor a nagy érték \(m_2\)-t támogatja.
+akkor a nagy érték $m_2$-t támogatja.
 
 ---
 
@@ -102,17 +102,17 @@ Tehát ha a két modellnek azonos prior valószínűséget adunk, akkor a modell
 
 ## A Bayes-faktor értelmezése
 
-Az alábbi táblázat egy gyakran használt értelmezési skálát mutat. A táblázatban \(BF_{12}\) az \(m_1\) modell melletti bizonyítékot méri az \(m_2\) modellel szemben.
+Az alábbi táblázat egy gyakran használt értelmezési skálát mutat. A táblázatban $BF_{12}$ az $m_1$ modell melletti bizonyítékot méri az $m_2$ modellel szemben.
 
-| \(BF_{12}\) értéke | Az \(m_1\) melletti bizonyíték erőssége |
+| $BF_{12}$ értéke | Az $m_1$ melletti bizonyíték erőssége |
 |---|---|
-| \(BF_{12}<1\) | Az adat inkább \(m_2\)-t támogatja |
-| \(1<BF_{12}<3.16\) | Alig említhető bizonyíték |
-| \(3.16<BF_{12}<6\) | Anekdotikus bizonyíték |
-| \(6<BF_{12}<10\) | Szubsztanciális bizonyíték |
-| \(10<BF_{12}<31.62\) | Erős bizonyíték |
-| \(31.62<BF_{12}<100\) | Nagyon erős bizonyíték |
-| \(100<BF_{12}\) | Döntő bizonyíték |
+| $BF_{12}<1$ | Az adat inkább $m_2$-t támogatja |
+| $1<BF_{12}<3.16$ | Alig említhető bizonyíték |
+| $3.16<BF_{12}<6$ | Anekdotikus bizonyíték |
+| $6<BF_{12}<10$ | Szubsztanciális bizonyíték |
+| $10<BF_{12}<31.62$ | Erős bizonyíték |
+| $31.62<BF_{12}<100$ | Nagyon erős bizonyíték |
+| $100<BF_{12}$ | Döntő bizonyíték |
 
 Ez nem mechanikus döntési szabály, hanem értelmezési segédlet. A legfontosabb továbbra is az, hogy tudjuk, melyik irányban számoltuk a Bayes-faktort.
 
@@ -294,7 +294,7 @@ A kérdés: az elitgimnáziumi adat tekinthető-e úgy, mintha ugyanabból az el
 
 Két modellt hasonlítunk össze.
 
-Az \(m_1\) modell szerint az elitgimnáziumi arány lényegében az átlagos gimnáziumi arány körül várható. Ezért \(p\)-re egy 0.25 várható értékű, erősen informatív béta-priort teszünk:
+Az $m_1$ modell szerint az elitgimnáziumi arány lényegében az átlagos gimnáziumi arány körül várható. Ezért $p$-re egy 0.25 várható értékű, erősen informatív béta-priort teszünk:
 
 $$p\sim \text{Beta}(30,90).$$
 
@@ -302,11 +302,11 @@ Ennek várható értéke:
 
 $$E(p)=\frac{30}{30+90}=0.25.$$
 
-Az \(m_2\) modell szerint az elitgimnáziumok között nagy eltérések lehetnek, ezért \(p\)-re egyenletes priort teszünk:
+Az $m_2$ modell szerint az elitgimnáziumok között nagy eltérések lehetnek, ezért $p$-re egyenletes priort teszünk:
 
 $$p\sim \text{Beta}(1,1).$$
 
-Ez ugyanaz, mint a \([0,1]\) intervallumon vett uniform prior.
+Ez ugyanaz, mint a $[0,1]$ intervallumon vett uniform prior.
 
 A megfigyelt adat:
 
@@ -348,7 +348,7 @@ var output = Infer({
 viz.marginals(output);
 ```
 
-A fenti kód az \(m_1\) modellt mutatja. Ugyanezt külön lefuttathatjuk az \(m_2\) modellre is, ahol a prior:
+A fenti kód az $m_1$ modellt mutatja. Ugyanezt külön lefuttathatjuk az $m_2$ modellre is, ahol a prior:
 
 ```javascript
 var p = uniform(0, 1);
@@ -370,7 +370,7 @@ $$\Pr(17\mid m_1)$$
 
 $$\Pr(17\mid m_2).$$
 
-Ha az \(m_2\) modellt akarjuk az \(m_1\)-hez képest értékelni, akkor ezt számoljuk:
+Ha az $m_2$ modellt akarjuk az $m_1$-hez képest értékelni, akkor ezt számoljuk:
 
 $$BF_{21} = \frac{\Pr(17\mid m_2)}{\Pr(17\mid m_1)}.$$
 
@@ -390,9 +390,9 @@ Ezért:
 
 $$BF_{21} = \frac{0.03125}{0.000966} \approx 32.35.$$
 
-Ez azt jelenti, hogy a megfigyelt adat körülbelül 32-szer valószínűbb az \(m_2\) modellben, mint az \(m_1\) modellben.
+Ez azt jelenti, hogy a megfigyelt adat körülbelül 32-szer valószínűbb az $m_2$ modellben, mint az $m_1$ modellben.
 
-Vagyis az adat **nagyon erősen \(m_2\)-t támogatja**.
+Vagyis az adat **nagyon erősen $m_2$-t támogatja**.
 
 Értelmezés: az elitgimnáziumi arány nagyon nehezen fér össze azzal a modellel, amely szerint az elitgimnáziumi osztály is lényegében az átlagos gimnáziumi 25%-os arány körül várható. Az adat sokkal jobban illeszkedik ahhoz a modellhez, amely nagyobb intézmények közötti eltérést enged meg.
 
@@ -430,7 +430,7 @@ Ezzel a priorral az elitgimnáziumi adat, vagyis a 19/31-es eredmény, már nem 
 
 $$BF_{21} = \frac{\Pr(19\mid m_2)}{\Pr(19\mid m_1)} \approx 0.79.$$
 
-Ez azt jelenti, hogy az adat nem az egyenletes modellt támogatja az átlagos gimnáziumi arány köré tett modell ellenében. Inkább arról van szó, hogy a két modell között nincs erős különbség, sőt ebben a konkrét beállításban \(m_1\) enyhén jobban teljesít.
+Ez azt jelenti, hogy az adat nem az egyenletes modellt támogatja az átlagos gimnáziumi arány köré tett modell ellenében. Inkább arról van szó, hogy a két modell között nincs erős különbség, sőt ebben a konkrét beállításban $m_1$ enyhén jobban teljesít.
 
 Ez azért tanulságos, mert itt a különbség ugyan látható:
 
@@ -477,7 +477,7 @@ Az információ intuitív értelmezése a **meglepettség**. Egy esemény annál
 
 Ha egy esemény valószínűsége nagy, akkor az esemény bekövetkezése kevésbé meglepő. Ha egy esemény valószínűsége kicsi, akkor az esemény bekövetkezése nagyon meglepő.
 
-Egy \(X=x\) esemény információtartalmát így definiáljuk:
+Egy $X=x$ esemény információtartalmát így definiáljuk:
 
 $$I(X=x) = -\log_2 \Pr(X=x).$$
 
@@ -489,10 +489,10 @@ A negatív előjelre azért van szükség, mert a valószínűségek 0 és 1 kö
 
 Például:
 
-- ha \(\Pr(X=x)=1\), akkor \(I(X=x)=0\), vagyis nincs meglepetés;
-- ha \(\Pr(X=x)\) kicsi, akkor \(I(X=x)\) nagy, vagyis az esemény meglepő.
+- ha $\Pr(X=x)=1$, akkor $I(X=x)=0$, vagyis nincs meglepetés;
+- ha $\Pr(X=x)$ kicsi, akkor $I(X=x)$ nagy, vagyis az esemény meglepő.
 
-Azért használunk logaritmust, mert független események esetén az együttes valószínűség szorzódik, az információtartalmak pedig összeadódnak. Ha \(A\) és \(B\) függetlenek, akkor:
+Azért használunk logaritmust, mert független események esetén az együttes valószínűség szorzódik, az információtartalmak pedig összeadódnak. Ha $A$ és $B$ függetlenek, akkor:
 
 $$\Pr(A\cap B)=\Pr(A)\Pr(B).$$
 
@@ -514,7 +514,7 @@ Diszkrét esetben:
 
 $$H(X) = -\sum_x \Pr(X=x)\log \Pr(X=x).$$
 
-Ha az eloszlást \(P\)-vel jelöljük, akkor:
+Ha az eloszlást $P$-vel jelöljük, akkor:
 
 $$H(P) = -\sum_x P(x)\log P(x).$$
 
@@ -524,19 +524,19 @@ Az entrópia tehát azt méri, hogy átlagosan mennyire bizonytalan az eloszlás
 
 ## Keresztentrópia
 
-Ha az adat valójában a \(P\) eloszlásból jön, de mi a \(Q\) eloszlást használjuk az előrejelzésére vagy kódolására, akkor az átlagos információtartalom:
+Ha az adat valójában a $P$ eloszlásból jön, de mi a $Q$ eloszlást használjuk az előrejelzésére vagy kódolására, akkor az átlagos információtartalom:
 
 $$H(P,Q) = -\sum_x P(x)\log Q(x).$$
 
 Ezt keresztentrópiának nevezzük.
 
-A keresztentrópia azt méri, hogy mennyi információra van szükségünk átlagosan, ha a \(Q\) eloszlást használjuk, miközben az adatok ténylegesen a \(P\) eloszlás szerint jönnek.
+A keresztentrópia azt méri, hogy mennyi információra van szükségünk átlagosan, ha a $Q$ eloszlást használjuk, miközben az adatok ténylegesen a $P$ eloszlás szerint jönnek.
 
 ---
 
 ## KL-divergencia
 
-A Kullback–Leibler-divergencia azt méri, hogy mennyi többletinformációra van szükségünk, ha a \(P\) eloszlást a \(Q\) eloszlással közelítjük.
+A Kullback–Leibler-divergencia azt méri, hogy mennyi többletinformációra van szükségünk, ha a $P$ eloszlást a $Q$ eloszlással közelítjük.
 
 Definíció szerint:
 
@@ -564,7 +564,7 @@ $$D_{KL}(P\parallel Q) = \sum_x P(x)\log\frac{P(x)}{Q(x)}.$$
 
 Bayesiánus nyelven a KL-divergencia azt méri, hogy mekkora információváltozás történik, amikor a priorból poszterior lesz.
 
-Ha \(Q\) a prior és \(P\) a poszterior, akkor:
+Ha $Q$ a prior és $P$ a poszterior, akkor:
 
 $$D_{KL}(P\parallel Q)$$
 
