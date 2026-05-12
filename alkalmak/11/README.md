@@ -174,7 +174,7 @@ Ez pontosan ugyanaz a gondolat, mint a Bayes-faktornál: megnézzük, hogy a meg
 
 Fontos megjegyzés: az alábbi kód az esőt közvetlenül a megfigyelt felhősségből jósolja. Ha azt kondicionáljuk, hogy az ég derült, akkor az eső valószínűsége a modellben 0.1. Ez nem valódi időbeli „másnapi” előrejelzés, mert a modellben nincs külön mai és holnapi időpont. Ahhoz külön időbeli átmeneti modellre lenne szükség.
 
-## Javított WebPPL-modell
+## WebPPL-modell
 
 ```javascript
 var HiperModel = Infer({method: 'rejection', samples: 10000}, function() {
