@@ -368,3 +368,88 @@ a többi zaj
 ```
 
 A program ezután azt nézi meg, hogy a diákok válaszai melyik címkézéshez illeszkednek jobban.
+
+## 7. Adatfelvétel és kódolás
+
+A diákok minden kérdésnél csak két választ adhatnak:
+
+```text
+1 = érvényesnek tartja a következtetést
+0 = nem tartja érvényesnek a következtetést
+```
+
+A válaszokat egy egyszerű táblázatban rögzítjük.
+
+Példa 5 diákkal:
+
+| diák | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 |
+|---|---:|---:|---:|---:|---:|---:|
+| Anna | 0 | 0 | 1 | 0 | 0 | 1 |
+| Bence | 1 | 0 | 1 | 0 | 1 | 0 |
+| Csilla | 0 | 0 | 1 | 0 | 0 | 1 |
+| Dávid | 1 | 0 | 1 | 0 | 1 | 0 |
+| Eszter | 0 | 0 | 1 | 0 | 0 | 1 |
+
+Ez csak példaadat.
+
+A táblázatban kétféle válaszminta keveredik.
+
+Anna, Csilla és Eszter inkább az intuicionista mintát követik:
+
+```text
+Q3 = érvényes
+Q6 = érvényes
+```
+
+Bence és Dávid inkább a mentális modellt követik:
+
+```text
+Q1 = érvényes
+Q3 = érvényes
+Q5 = érvényes
+```
+
+A WebPPL-kódban ugyanezt az adatot így fogjuk megadni:
+
+```javascript
+var responses = [
+  {subj: "Anna",   item: "Q1", response: 0},
+  {subj: "Anna",   item: "Q2", response: 0},
+  {subj: "Anna",   item: "Q3", response: 1},
+  {subj: "Anna",   item: "Q4", response: 0},
+  {subj: "Anna",   item: "Q5", response: 0},
+  {subj: "Anna",   item: "Q6", response: 1},
+
+  {subj: "Bence",  item: "Q1", response: 1},
+  {subj: "Bence",  item: "Q2", response: 0},
+  {subj: "Bence",  item: "Q3", response: 1},
+  {subj: "Bence",  item: "Q4", response: 0},
+  {subj: "Bence",  item: "Q5", response: 1},
+  {subj: "Bence",  item: "Q6", response: 0},
+
+  {subj: "Csilla", item: "Q1", response: 0},
+  {subj: "Csilla", item: "Q2", response: 0},
+  {subj: "Csilla", item: "Q3", response: 1},
+  {subj: "Csilla", item: "Q4", response: 0},
+  {subj: "Csilla", item: "Q5", response: 0},
+  {subj: "Csilla", item: "Q6", response: 1},
+
+  {subj: "Dávid",  item: "Q1", response: 1},
+  {subj: "Dávid",  item: "Q2", response: 0},
+  {subj: "Dávid",  item: "Q3", response: 1},
+  {subj: "Dávid",  item: "Q4", response: 0},
+  {subj: "Dávid",  item: "Q5", response: 1},
+  {subj: "Dávid",  item: "Q6", response: 0},
+
+  {subj: "Eszter", item: "Q1", response: 0},
+  {subj: "Eszter", item: "Q2", response: 0},
+  {subj: "Eszter", item: "Q3", response: 1},
+  {subj: "Eszter", item: "Q4", response: 0},
+  {subj: "Eszter", item: "Q5", response: 0},
+  {subj: "Eszter", item: "Q6", response: 1}
+];
+```
+
+Ha az órán valódi adatot veszünk fel, akkor csak ezt a részt kell átírni.
+
+A program többi része változatlan marad.
