@@ -184,3 +184,187 @@ Melyik modell címkézi úgy a kérdéseket jelnek és zajnak,
 hogy a diákok válaszai mellett nagy legyen a d,
 és értelmezhető legyen a c?
 ```
+## 5. A mini-kérdőív
+
+A kérdőívben hat rövid item szerepel.
+
+Minden item ugyanazt az alapszerkezetet használja:
+
+```text
+K = király van a kézben
+A = ász van a kézben
+```
+
+A diákok feladata minden esetben ugyanaz:
+
+```text
+Következik-e a megadott konklúzió?
+```
+
+A válasz kétértékű:
+
+```text
+1 = érvényes
+0 = nem érvényes
+```
+
+---
+
+### Q1
+
+```text
+Tegyük fel, hogy igaz:
+
+(K → A) vagy (¬K → A)
+
+Konklúzió:
+
+A
+```
+
+Válasz:
+
+```text
+Érvényes / Nem érvényes
+```
+
+---
+
+### Q2
+
+```text
+Tegyük fel, hogy igaz:
+
+(K → A) vagy (¬K → A)
+
+Konklúzió:
+
+¬A
+```
+
+Válasz:
+
+```text
+Érvényes / Nem érvényes
+```
+
+---
+
+### Q3
+
+```text
+Tegyük fel, hogy igaz:
+
+(K → A) és (¬K → A)
+
+Konklúzió:
+
+A
+```
+
+Válasz:
+
+```text
+Érvényes / Nem érvényes
+```
+
+---
+
+### Q4
+
+```text
+Tegyük fel, hogy igaz:
+
+(K → A) és (¬K → A)
+
+Konklúzió:
+
+¬A
+```
+
+Válasz:
+
+```text
+Érvényes / Nem érvényes
+```
+
+---
+
+### Q5
+
+```text
+Tegyük fel, hogy igaz:
+
+(K → A) kizáró vagy (¬K → A)
+
+Konklúzió:
+
+A
+```
+
+Válasz:
+
+```text
+Érvényes / Nem érvényes
+```
+
+---
+
+### Q6
+
+```text
+Tegyük fel, hogy igaz:
+
+(K → A) kizáró vagy (¬K → A)
+
+Konklúzió:
+
+¬A
+```
+
+Válasz:
+
+```text
+Érvényes / Nem érvényes
+```
+
+---
+
+## 6. Hogyan kódoljuk az itemeket?
+
+A programnak nem elég az, hogy látja a diákok válaszait.
+
+Azt is meg kell mondanunk neki, hogy a két modell szerint melyik item számít jelnek.
+
+```text
+jel = a modell szerint érvényes következtetés
+zaj = a modell szerint nem érvényes következtetés
+```
+
+A két modell eltérően címkézi az itemeket.
+
+| item | konnektívum | konklúzió | mentális modell | intuicionista modell |
+|---|---|---|---|---|
+| Q1 | vagy | A | jel | zaj |
+| Q2 | vagy | ¬A | zaj | zaj |
+| Q3 | és | A | jel | jel |
+| Q4 | és | ¬A | zaj | zaj |
+| Q5 | kizáró vagy | A | jel | zaj |
+| Q6 | kizáró vagy | ¬A | zaj | jel |
+
+A mentális modell egyszerű heurisztikája:
+
+```text
+ha a konklúzió A, akkor jel
+ha a konklúzió ¬A, akkor zaj
+```
+
+Az intuicionista modell egyszerűsített órai címkézése:
+
+```text
+az "és + A" item jel
+a "kizáró vagy + ¬A" item jel
+a többi zaj
+```
+
+A program ezután azt nézi meg, hogy a diákok válaszai melyik címkézéshez illeszkednek jobban.
