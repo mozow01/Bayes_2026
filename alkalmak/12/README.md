@@ -453,3 +453,196 @@ var responses = [
 Ha az órán valódi adatot veszünk fel, akkor csak ezt a részt kell átírni.
 
 A program többi része változatlan marad.
+## 8. A modell alapötlete WebPPL-ben
+
+A WebPPL-modellben három dolgot kell megadnunk:
+
+```text
+1. melyik két modellt hasonlítjuk össze,
+2. melyik item melyik modell szerint jel vagy zaj,
+3. hogyan lesz a jel/zaj állapotból válaszvalószínűség.
+```
+
+A két modell:
+
+```javascript
+var models = ["mental", "intuitionistic"];
+```
+
+Az itemek:
+
+```javascript
+var items = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6"];
+```
+
+A legfontosabb függvény azt mondja meg, hogy egy item az adott modell szerint jel-e.
+
+```javascript
+var isSignal = function(model, item) {
+  if (model === "mental") {
+    return item === "Q1" || item === "Q3" || item === "Q5";
+  }
+
+  if (model === "intuitionistic") {
+    return item === "Q3" || item === "Q6";
+  }
+
+  return false;
+};
+```
+
+A mentális modell szerint ezek a jelek:
+
+```text
+Q1, Q3, Q5
+```
+
+Mert ezekben a konklúzió:
+
+```text
+A
+```
+
+vagyis:
+
+```text
+van ász
+```
+
+Az intuicionista modell szerint ezek a jelek:
+
+```text
+Q3, Q6
+```
+
+Mert ezekben van levezethető konklúzió:
+
+```text
+Q3: és + A
+Q6: kizáró vagy + ¬A
+```
+
+---
+
+## 9. Hogyan lesz ebből válaszvalószínűség?
+
+A modellben a diák nem közvetlenül a logikai igazságot látja.
+
+Inkább kap egy belső „erősségérzetet”.
+
+Ha ez az erősség átlépi a kritériumot, akkor azt mondja:
+
+```text
+érvényes
+```
+
+Ha nem lépi át, akkor azt mondja:
+
+```text
+nem érvényes
+```
+
+Ezt két paraméter szabályozza:
+
+```text
+d = mennyire válik szét a jel és a zaj
+c = mennyire szigorú a döntési kritérium
+```
+
+A WebPPL-ben először rácson próbáljuk ki a lehetséges értékeket:
+
+```javascript
+var dGrid = [0.2, 0.6, 1.0, 1.4, 1.8, 2.2, 2.6, 3.0];
+var cGrid = [-1.2, -0.8, -0.4, 0.0, 0.4, 0.8, 1.2];
+```
+
+Ez nem elméleti állítás, csak számítási egyszerűsítés.
+
+Azért használunk rácsot, mert így a WebPPL `enumerate` módszerrel gyorsan és stabilan végig tudja próbálni a lehetőségeket.
+
+---
+
+## 10. A normális eloszlás eloszlásfüggvénye
+
+Az SDT-képletben szükségünk van a normális eloszlás eloszlásfüggvényére.
+
+Ezt `Phi`-vel jelöljük.
+
+WebPPL-ben megadhatjuk így:
+
+```javascript
+var erf = function(x) {
+  var sign = x >= 0 ? 1 : -1;
+  var ax = Math.abs(x);
+
+  var a1 = 0.254829592;
+  var a2 = -0.284496736;
+  var a3 = 1.421413741;
+  var a4 = -1.453152027;
+  var a5 = 1.061405429;
+  var p = 0.3275911;
+
+  var t = 1.0 / (1.0 + p * ax);
+  var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-ax * ax);
+
+  return sign * y;
+};
+
+var Phi = function(x) {
+  return 0.5 * (1.0 + erf(x / Math.sqrt(2.0)));
+};
+```
+
+---
+
+## 11. Az SDT-válaszfüggvény
+
+Most jön a lényeg.
+
+Ha az item jel, akkor az „érvényes” válasz valószínűsége:
+
+```text
+Phi(d / 2 - c)
+```
+
+Ha az item zaj, akkor az „érvényes” válasz valószínűsége:
+
+```text
+Phi(-d / 2 - c)
+```
+
+WebPPL-ben:
+
+```javascript
+var pValid = function(signal, d, c) {
+  if (signal) {
+    return Phi(d / 2.0 - c);
+  } else {
+    return Phi(-d / 2.0 - c);
+  }
+};
+```
+
+Ez a függvény mondja meg, hogy egy adott modell, `d` és `c` mellett mekkora eséllyel válaszolja a diák azt, hogy:
+
+```text
+érvényes
+```
+
+Például:
+
+```javascript
+pValid(true, 2.0, 0.0);
+```
+
+Ez egy signal itemre ad válaszvalószínűséget.
+
+```javascript
+pValid(false, 2.0, 0.0);
+```
+
+Ez egy noise itemre ad válaszvalószínűséget.
+
+Ha `d` nagy, akkor a két érték távol lesz egymástól.
+
+Ha `d` kicsi, akkor a modell alig tud különbséget tenni jel és zaj között.
