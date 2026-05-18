@@ -646,3 +646,167 @@ Ez egy noise itemre ad válaszvalószínűséget.
 Ha `d` nagy, akkor a két érték távol lesz egymástól.
 
 Ha `d` kicsi, akkor a modell alig tud különbséget tenni jel és zaj között.
+## 12. Teljes WebPPL-modell
+
+Az alábbi kód egyben futtatható WebPPL-ben.
+
+A modell két lehetséges belső modellt hasonlít össze:
+
+```text
+mental
+intuitionistic
+```
+
+A program azt becsli, hogy a válaszadatok melyik modellhez illeszkednek jobban.
+
+```javascript
+// king_ace_sdt.wppl
+
+// ---------- Adatok ----------
+
+var responses = [
+  {subj: "Anna",   item: "Q1", response: 0},
+  {subj: "Anna",   item: "Q2", response: 0},
+  {subj: "Anna",   item: "Q3", response: 1},
+  {subj: "Anna",   item: "Q4", response: 0},
+  {subj: "Anna",   item: "Q5", response: 0},
+  {subj: "Anna",   item: "Q6", response: 1},
+
+  {subj: "Bence",  item: "Q1", response: 1},
+  {subj: "Bence",  item: "Q2", response: 0},
+  {subj: "Bence",  item: "Q3", response: 1},
+  {subj: "Bence",  item: "Q4", response: 0},
+  {subj: "Bence",  item: "Q5", response: 1},
+  {subj: "Bence",  item: "Q6", response: 0},
+
+  {subj: "Csilla", item: "Q1", response: 0},
+  {subj: "Csilla", item: "Q2", response: 0},
+  {subj: "Csilla", item: "Q3", response: 1},
+  {subj: "Csilla", item: "Q4", response: 0},
+  {subj: "Csilla", item: "Q5", response: 0},
+  {subj: "Csilla", item: "Q6", response: 1},
+
+  {subj: "Dávid",  item: "Q1", response: 1},
+  {subj: "Dávid",  item: "Q2", response: 0},
+  {subj: "Dávid",  item: "Q3", response: 1},
+  {subj: "Dávid",  item: "Q4", response: 0},
+  {subj: "Dávid",  item: "Q5", response: 1},
+  {subj: "Dávid",  item: "Q6", response: 0},
+
+  {subj: "Eszter", item: "Q1", response: 0},
+  {subj: "Eszter", item: "Q2", response: 0},
+  {subj: "Eszter", item: "Q3", response: 1},
+  {subj: "Eszter", item: "Q4", response: 0},
+  {subj: "Eszter", item: "Q5", response: 0},
+  {subj: "Eszter", item: "Q6", response: 1}
+];
+
+// ---------- Modellcímkézés ----------
+
+var isSignal = function(model, item) {
+  if (model === "mental") {
+    return item === "Q1" || item === "Q3" || item === "Q5";
+  }
+
+  if (model === "intuitionistic") {
+    return item === "Q3" || item === "Q6";
+  }
+
+  return false;
+};
+
+// ---------- Segédfüggvények ----------
+
+var erf = function(x) {
+  var sign = x >= 0 ? 1 : -1;
+  var ax = Math.abs(x);
+
+  var a1 = 0.254829592;
+  var a2 = -0.284496736;
+  var a3 = 1.421413741;
+  var a4 = -1.453152027;
+  var a5 = 1.061405429;
+  var p = 0.3275911;
+
+  var t = 1.0 / (1.0 + p * ax);
+  var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) *
+    t * Math.exp(-ax * ax);
+
+  return sign * y;
+};
+
+var Phi = function(x) {
+  return 0.5 * (1.0 + erf(x / Math.sqrt(2.0)));
+};
+
+var clamp = function(p) {
+  return Math.max(0.001, Math.min(0.999, p));
+};
+
+// ---------- SDT válaszmodell ----------
+
+var pValid = function(signal, d, c) {
+  var p = signal ?
+    Phi(d / 2.0 - c) :
+    Phi(-d / 2.0 - c);
+
+  return clamp(p);
+};
+
+// ---------- Paraméterrács ----------
+
+var dGrid = [0.2, 0.6, 1.0, 1.4, 1.8, 2.2, 2.6, 3.0];
+var cGrid = [-1.2, -0.8, -0.4, 0.0, 0.4, 0.8, 1.2];
+
+// ---------- Bayesiánus modell ----------
+
+var posterior = Infer({method: "enumerate"}, function() {
+  var model = uniformDraw(["mental", "intuitionistic"]);
+  var d = uniformDraw(dGrid);
+  var c = uniformDraw(cGrid);
+
+  map(function(r) {
+    var signal = isSignal(model, r.item);
+    var p = pValid(signal, d, c);
+    observe(Bernoulli({p: p}), r.response);
+  }, responses);
+
+  return {
+    model: model,
+    d: d,
+    c: c
+  };
+});
+
+print("Posterior:");
+print(posterior);
+
+// ---------- Modellposterior külön ----------
+
+var modelPosterior = Infer({method: "enumerate"}, function() {
+  var sample = sample(posterior);
+  return sample.model;
+});
+
+print("Model posterior:");
+print(modelPosterior);
+```
+
+A kódban a legfontosabb sor ez:
+
+```javascript
+var model = uniformDraw(["mental", "intuitionistic"]);
+```
+
+Ez azt jelenti, hogy a program induláskor még egyik modellt sem részesíti előnyben.
+
+A válaszadatok alapján frissíti ezt a bizonytalanságot.
+
+A végén ezt kapjuk:
+
+```text
+P(mental | adatok)
+P(intuitionistic | adatok)
+```
+
+A `d` és `c` értékek pedig azt mutatják meg, hogy az adott modell mellett mennyire jól különül el a jel és a zaj, illetve milyen irányú a válaszbias.
