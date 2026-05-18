@@ -646,167 +646,229 @@ Ez egy noise itemre ad válaszvalószínűséget.
 Ha `d` nagy, akkor a két érték távol lesz egymástól.
 
 Ha `d` kicsi, akkor a modell alig tud különbséget tenni jel és zaj között.
+
 ## 12. Teljes WebPPL-modell
 
-Az alábbi kód egyben futtatható WebPPL-ben.
+Az alábbi kód a korábbi, működő program egyszerűsített változata.
 
-A modell két lehetséges belső modellt hasonlít össze:
+Most csak két modell van benne:
 
 ```text
-mental
-intuitionistic
+mental_model
+intuitionistic_model
 ```
 
-A program azt becsli, hogy a válaszadatok melyik modellhez illeszkednek jobban.
+Az adatok itemenként vannak összesítve.
+
+```text
+y = hány diák mondta azt, hogy a következtetés érvényes
+n = hány diák válaszolt összesen
+```
 
 ```javascript
-// king_ace_sdt.wppl
+// king_ace_two_model_sdt.wppl
 
 // ---------- Adatok ----------
+// y = hany diak mondta azt, hogy ervenyes
+// n = hany diak valaszolt osszesen
 
-var responses = [
-  {subj: "Anna",   item: "Q1", response: 0},
-  {subj: "Anna",   item: "Q2", response: 0},
-  {subj: "Anna",   item: "Q3", response: 1},
-  {subj: "Anna",   item: "Q4", response: 0},
-  {subj: "Anna",   item: "Q5", response: 0},
-  {subj: "Anna",   item: "Q6", response: 1},
-
-  {subj: "Bence",  item: "Q1", response: 1},
-  {subj: "Bence",  item: "Q2", response: 0},
-  {subj: "Bence",  item: "Q3", response: 1},
-  {subj: "Bence",  item: "Q4", response: 0},
-  {subj: "Bence",  item: "Q5", response: 1},
-  {subj: "Bence",  item: "Q6", response: 0},
-
-  {subj: "Csilla", item: "Q1", response: 0},
-  {subj: "Csilla", item: "Q2", response: 0},
-  {subj: "Csilla", item: "Q3", response: 1},
-  {subj: "Csilla", item: "Q4", response: 0},
-  {subj: "Csilla", item: "Q5", response: 0},
-  {subj: "Csilla", item: "Q6", response: 1},
-
-  {subj: "Dávid",  item: "Q1", response: 1},
-  {subj: "Dávid",  item: "Q2", response: 0},
-  {subj: "Dávid",  item: "Q3", response: 1},
-  {subj: "Dávid",  item: "Q4", response: 0},
-  {subj: "Dávid",  item: "Q5", response: 1},
-  {subj: "Dávid",  item: "Q6", response: 0},
-
-  {subj: "Eszter", item: "Q1", response: 0},
-  {subj: "Eszter", item: "Q2", response: 0},
-  {subj: "Eszter", item: "Q3", response: 1},
-  {subj: "Eszter", item: "Q4", response: 0},
-  {subj: "Eszter", item: "Q5", response: 0},
-  {subj: "Eszter", item: "Q6", response: 1}
+var items = [
+  {id: 'OR_A',       label: 'Q1: vagy / van asz',          y: 2, n: 5},
+  {id: 'OR_NOT_A',   label: 'Q2: vagy / nincs asz',        y: 0, n: 5},
+  {id: 'AND_A',      label: 'Q3: es / van asz',            y: 5, n: 5},
+  {id: 'AND_NOT_A',  label: 'Q4: es / nincs asz',          y: 0, n: 5},
+  {id: 'XOR_A',      label: 'Q5: kizaro vagy / van asz',   y: 2, n: 5},
+  {id: 'XOR_NOT_A',  label: 'Q6: kizaro vagy / nincs asz', y: 3, n: 5}
 ];
 
-// ---------- Modellcímkézés ----------
+// ---------- A ket vizsgalt modell ----------
 
-var isSignal = function(model, item) {
-  if (model === "mental") {
-    return item === "Q1" || item === "Q3" || item === "Q5";
+var candidateModels = [
+  'mental_model',
+  'intuitionistic_model'
+];
+
+// ---------- Melyik item jel az adott modell szerint? ----------
+// true  = jel, vagyis a modell szerint ervenyes kovetkeztetes
+// false = zaj, vagyis a modell szerint nem ervenyes kovetkeztetes
+
+var isSignal = function(modelName, itemId) {
+  if (modelName === 'mental_model') {
+    return itemId === 'OR_A' ||
+           itemId === 'AND_A' ||
+           itemId === 'XOR_A';
   }
 
-  if (model === "intuitionistic") {
-    return item === "Q3" || item === "Q6";
+  if (modelName === 'intuitionistic_model') {
+    return itemId === 'AND_A' ||
+           itemId === 'XOR_NOT_A';
   }
 
   return false;
 };
 
-// ---------- Segédfüggvények ----------
+// ---------- Normalis eloszlas eloszlasfuggvenye ----------
 
 var erf = function(x) {
-  var sign = x >= 0 ? 1 : -1;
+  var sign = x < 0 ? -1 : 1;
   var ax = Math.abs(x);
 
-  var a1 = 0.254829592;
-  var a2 = -0.284496736;
-  var a3 = 1.421413741;
-  var a4 = -1.453152027;
-  var a5 = 1.061405429;
-  var p = 0.3275911;
+  var t = 1.0 / (1.0 + 0.3275911 * ax);
 
-  var t = 1.0 / (1.0 + p * ax);
-  var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) *
+  var y = 1.0 -
+    (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t
+    - 0.284496736) * t + 0.254829592) *
     t * Math.exp(-ax * ax);
 
   return sign * y;
 };
 
-var Phi = function(x) {
+var phi = function(x) {
   return 0.5 * (1.0 + erf(x / Math.sqrt(2.0)));
 };
 
-var clamp = function(p) {
-  return Math.max(0.001, Math.min(0.999, p));
+var clamp = function(x) {
+  return Math.max(0.000001, Math.min(0.999999, x));
 };
 
-// ---------- SDT válaszmodell ----------
+// ---------- SDT valaszmodell ----------
+// d = diszkriminabilitas
+// c = valaszbias / kriterium
 
 var pValid = function(signal, d, c) {
   var p = signal ?
-    Phi(d / 2.0 - c) :
-    Phi(-d / 2.0 - c);
+    1.0 - phi(c - d / 2.0) :
+    1.0 - phi(c + d / 2.0);
 
   return clamp(p);
 };
 
-// ---------- Paraméterrács ----------
+// ---------- Parameterracs ----------
 
-var dGrid = [0.2, 0.6, 1.0, 1.4, 1.8, 2.2, 2.6, 3.0];
-var cGrid = [-1.2, -0.8, -0.4, 0.0, 0.4, 0.8, 1.2];
+var dGrid = [0.2, 0.6, 1.0, 1.4, 1.8, 2.2, 2.6, 3.0, 3.4];
 
-// ---------- Bayesiánus modell ----------
+var cGrid = [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5];
 
-var posterior = Infer({method: "enumerate"}, function() {
-  var model = uniformDraw(["mental", "intuitionistic"]);
+// ---------- Likelihood ----------
+
+var observeItems = function(i, modelName, d, c) {
+  if (i === items.length) {
+    return true;
+  } else {
+    var item = items[i];
+    var signal = isSignal(modelName, item.id);
+    var p = pValid(signal, d, c);
+
+    factor(Binomial({p: p, n: item.n}).score(item.y));
+
+    return observeItems(i + 1, modelName, d, c);
+  }
+};
+
+// ---------- Bayesi modell ----------
+
+var fit = function() {
+  var modelName = categorical({
+    vs: candidateModels,
+    ps: [0.5, 0.5]
+  });
+
   var d = uniformDraw(dGrid);
   var c = uniformDraw(cGrid);
 
-  map(function(r) {
-    var signal = isSignal(model, r.item);
-    var p = pValid(signal, d, c);
-    observe(Bernoulli({p: p}), r.response);
-  }, responses);
+  observeItems(0, modelName, d, c);
 
   return {
-    model: model,
+    model: modelName,
     d: d,
     c: c
   };
+};
+
+var posterior = Infer({method: 'enumerate'}, fit);
+
+// ---------- Modellposterior ----------
+
+var posteriorModel = Infer({method: 'enumerate'}, function() {
+  return fit().model;
 });
 
-print("Posterior:");
-print(posterior);
+console.log('Posterior model probabilities');
+console.log(
+  'mental_model = ' +
+  Math.exp(posteriorModel.score('mental_model')).toPrecision(4)
+);
 
-// ---------- Modellposterior külön ----------
+console.log(
+  'intuitionistic_model = ' +
+  Math.exp(posteriorModel.score('intuitionistic_model')).toPrecision(4)
+);
 
-var modelPosterior = Infer({method: "enumerate"}, function() {
-  var sample = sample(posterior);
-  return sample.model;
-});
+// ---------- d es c posterior atlag ----------
 
-print("Model posterior:");
-print(modelPosterior);
+console.log('\nOverall posterior means');
+console.log(
+  'mean d = ' +
+  expectation(posterior, function(x) { return x.d; }).toFixed(3)
+);
+
+console.log(
+  'mean c = ' +
+  expectation(posterior, function(x) { return x.c; }).toFixed(3)
+);
+
+// ---------- Kulon illesztes mindket modellre ----------
+
+var fixedFit = function(fixedModelName) {
+  var d = uniformDraw(dGrid);
+  var c = uniformDraw(cGrid);
+
+  observeItems(0, fixedModelName, d, c);
+
+  return {
+    d: d,
+    c: c
+  };
+};
+
+var summarizeFixed = function(name) {
+  var p = Infer({method: 'enumerate'}, function() {
+    return fixedFit(name);
+  });
+
+  console.log('\nFixed model: ' + name);
+
+  console.log(
+    'mean d = ' +
+    expectation(p, function(x) { return x.d; }).toFixed(3)
+  );
+
+  console.log(
+    'mean c = ' +
+    expectation(p, function(x) { return x.c; }).toFixed(3)
+  );
+};
+
+summarizeFixed('mental_model');
+summarizeFixed('intuitionistic_model');
 ```
 
-A kódban a legfontosabb sor ez:
+Futtatás:
+
+```bash
+webppl king_ace_two_model_sdt.wppl
+```
+
+A lényegi javítás ez volt:
 
 ```javascript
-var model = uniformDraw(["mental", "intuitionistic"]);
+factor(Binomial({p: p, n: item.n}).score(item.y));
 ```
 
-Ez azt jelenti, hogy a program induláskor még egyik modellt sem részesíti előnyben.
+Nem ezt használjuk:
 
-A válaszadatok alapján frissíti ezt a bizonytalanságot.
-
-A végén ezt kapjuk:
-
-```text
-P(mental | adatok)
-P(intuitionistic | adatok)
+```javascript
+observe(Bernoulli({p: p}), 0);
 ```
 
-A `d` és `c` értékek pedig azt mutatják meg, hogy az adott modell mellett mennyire jól különül el a jel és a zaj, illetve milyen irányú a válaszbias.
+Így az itemenkénti válaszarányokat modellezzük, és nem futunk bele a `0/1` kontra `true/false` problémába.
