@@ -875,57 +875,110 @@ observe(Bernoulli({p: p}), 0);
 
 ## 13. `d`–`c` diagram WebPPL-ből
 
-A WebPPL nem klasszikus ábrarajzoló program, de tudunk vele SVG-képet generáltatni.
-
-Az SVG egy böngészőben megnyitható vektoros kép.
-
-A cél:
-
-```text
-x tengely = d
-y tengely = c
-paca mérete = posterior valószínűség
-```
-
-Vagyis a nagyobb pacák azt mutatják, hogy a modell szerint azok a `d`–`c` értékek magyarázzák jobban az adatokat.
-
-Fontos:
-
-```text
-Ha SVG-t akarunk menteni, akkor a program ne írjon ki mást,
-csak magát az SVG-kódot.
-```
-
-Ezért a diagramhoz érdemes külön fájlt készíteni, például:
+A diagramhoz külön fájlt használunk:
 
 ```text
 king_ace_two_model_sdt_plot.wppl
 ```
 
-A fájl eleje ugyanaz legyen, mint az előző modellben:
+Ez a program nem ír ki szöveges eredményt, csak SVG-képet.
 
-```text
-items
-candidateModels
-isSignal
-erf
-phi
-clamp
-pValid
-dGrid
-cGrid
+Futtatás:
+
+```bash
+webppl king_ace_two_model_sdt_plot.wppl > king_ace_dc_diagram.svg
 ```
 
-A korábbi `console.log` sorokat viszont töröljük vagy kommentezzük ki.
+A diagramon:
 
-Ezután a fájl végére jöhet ez a diagramgeneráló rész:
+```text
+x tengely = d
+y tengely = c
+paca mérete = posterior valószínűség
+szürke = mentális modell
+fekete = intuicionista modell
+```
 
 ```javascript
-// ---------- d-c diagram SVG-ben ----------
+// king_ace_two_model_sdt_plot.wppl
+
+// ---------- Adatok ----------
+
+var items = [
+  {id: 'OR_A',       label: 'Q1: vagy / van asz',          y: 2, n: 5},
+  {id: 'OR_NOT_A',   label: 'Q2: vagy / nincs asz',        y: 0, n: 5},
+  {id: 'AND_A',      label: 'Q3: es / van asz',            y: 5, n: 5},
+  {id: 'AND_NOT_A',  label: 'Q4: es / nincs asz',          y: 0, n: 5},
+  {id: 'XOR_A',      label: 'Q5: kizaro vagy / van asz',   y: 2, n: 5},
+  {id: 'XOR_NOT_A',  label: 'Q6: kizaro vagy / nincs asz', y: 3, n: 5}
+];
+
+var candidateModels = [
+  'mental_model',
+  'intuitionistic_model'
+];
+
+// ---------- Modellcímkézés ----------
+
+var isSignal = function(modelName, itemId) {
+  if (modelName === 'mental_model') {
+    return itemId === 'OR_A' ||
+           itemId === 'AND_A' ||
+           itemId === 'XOR_A';
+  }
+
+  if (modelName === 'intuitionistic_model') {
+    return itemId === 'AND_A' ||
+           itemId === 'XOR_NOT_A';
+  }
+
+  return false;
+};
+
+// ---------- SDT segédfüggvények ----------
+
+var erf = function(x) {
+  var sign = x < 0 ? -1 : 1;
+  var ax = Math.abs(x);
+
+  var t = 1.0 / (1.0 + 0.3275911 * ax);
+
+  var y = 1.0 -
+    (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t
+    - 0.284496736) * t + 0.254829592) *
+    t * Math.exp(-ax * ax);
+
+  return sign * y;
+};
+
+var phi = function(x) {
+  return 0.5 * (1.0 + erf(x / Math.sqrt(2.0)));
+};
+
+var clamp = function(x) {
+  return Math.max(0.000001, Math.min(0.999999, x));
+};
+
+var pValid = function(signal, d, c) {
+  var p = signal ?
+    1.0 - phi(c - d / 2.0) :
+    1.0 - phi(c + d / 2.0);
+
+  return clamp(p);
+};
+
+// ---------- Paraméterrács ----------
+
+var dGrid = [0.2, 0.6, 1.0, 1.4, 1.8, 2.2, 2.6, 3.0, 3.4];
+
+var cGrid = [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5];
+
+// ---------- Log-likelihood ----------
 
 var itemLogLikelihood = function(modelName, d, c, item) {
   var signal = isSignal(modelName, item.id);
   var p = pValid(signal, d, c);
+
   return Binomial({p: p, n: item.n}).score(item.y);
 };
 
@@ -938,60 +991,106 @@ var sumLogLikelihood = function(i, modelName, d, c) {
   }
 };
 
-var makePosteriorPoints = function() {
-  var raw = [];
-  var maxLogW = -1000000000;
+// ---------- Posterior-pontok mutáció nélkül ----------
 
-  map(function(modelName) {
-    map(function(d) {
-      map(function(c) {
-        var logPrior =
-          Math.log(0.5) +
-          Math.log(1.0 / dGrid.length) +
-          Math.log(1.0 / cGrid.length);
+var makePointsForC = function(modelName, d, cIndex) {
+  if (cIndex === cGrid.length) {
+    return [];
+  } else {
+    var c = cGrid[cIndex];
 
-        var logW = logPrior + sumLogLikelihood(0, modelName, d, c);
+    var logPrior =
+      Math.log(0.5) +
+      Math.log(1.0 / dGrid.length) +
+      Math.log(1.0 / cGrid.length);
 
-        raw.push({
-          model: modelName,
-          d: d,
-          c: c,
-          logW: logW
-        });
+    var logW = logPrior + sumLogLikelihood(0, modelName, d, c);
 
-        if (logW > maxLogW) {
-          maxLogW = logW;
-        }
-      }, cGrid);
-    }, dGrid);
-  }, candidateModels);
+    var point = [{
+      model: modelName,
+      d: d,
+      c: c,
+      logW: logW
+    }];
 
-  var total = 0;
+    return point.concat(makePointsForC(modelName, d, cIndex + 1));
+  }
+};
 
-  map(function(p) {
-    total = total + Math.exp(p.logW - maxLogW);
-  }, raw);
+var makePointsForD = function(modelName, dIndex) {
+  if (dIndex === dGrid.length) {
+    return [];
+  } else {
+    var d = dGrid[dIndex];
 
-  return map(function(p) {
-    return {
+    return makePointsForC(modelName, d, 0)
+      .concat(makePointsForD(modelName, dIndex + 1));
+  }
+};
+
+var makePointsForModel = function(modelIndex) {
+  if (modelIndex === candidateModels.length) {
+    return [];
+  } else {
+    var modelName = candidateModels[modelIndex];
+
+    return makePointsForD(modelName, 0)
+      .concat(makePointsForModel(modelIndex + 1));
+  }
+};
+
+var rawPoints = makePointsForModel(0);
+
+// ---------- Normalizálás ----------
+
+var maxLogW = function(points, i, currentMax) {
+  if (i === points.length) {
+    return currentMax;
+  } else {
+    var nextMax = points[i].logW > currentMax ? points[i].logW : currentMax;
+    return maxLogW(points, i + 1, nextMax);
+  }
+};
+
+var sumWeights = function(points, i, maxW) {
+  if (i === points.length) {
+    return 0;
+  } else {
+    return Math.exp(points[i].logW - maxW) +
+      sumWeights(points, i + 1, maxW);
+  }
+};
+
+var normalizePoints = function(points, i, maxW, totalW) {
+  if (i === points.length) {
+    return [];
+  } else {
+    var p = points[i];
+
+    var point = [{
       model: p.model,
       d: p.d,
       c: p.c,
-      weight: Math.exp(p.logW - maxLogW) / total
-    };
-  }, raw);
+      weight: Math.exp(p.logW - maxW) / totalW
+    }];
+
+    return point.concat(normalizePoints(points, i + 1, maxW, totalW));
+  }
 };
 
-var maxWeight = function(points) {
-  var m = 0;
+var maximumLogWeight = maxLogW(rawPoints, 0, -1000000000);
+var totalWeight = sumWeights(rawPoints, 0, maximumLogWeight);
+var points = normalizePoints(rawPoints, 0, maximumLogWeight, totalWeight);
 
-  map(function(p) {
-    if (p.weight > m) {
-      m = p.weight;
-    }
-  }, points);
+// ---------- SVG rajzolás ----------
 
-  return m;
+var maxPosteriorWeight = function(points, i, currentMax) {
+  if (i === points.length) {
+    return currentMax;
+  } else {
+    var nextMax = points[i].weight > currentMax ? points[i].weight : currentMax;
+    return maxPosteriorWeight(points, i + 1, nextMax);
+  }
 };
 
 var makeCircle = function(p, maxW, xScale, yScale) {
@@ -1001,7 +1100,7 @@ var makeCircle = function(p, maxW, xScale, yScale) {
   var r = 2 + 20 * Math.sqrt(p.weight / maxW);
 
   var fill = p.model === 'mental_model' ? '#999999' : '#111111';
-  var opacity = p.model === 'mental_model' ? 0.45 : 0.55;
+  var opacity = p.model === 'mental_model' ? 0.45 : 0.60;
 
   return '<circle cx="' + x.toFixed(1) +
     '" cy="' + y.toFixed(1) +
@@ -1009,6 +1108,50 @@ var makeCircle = function(p, maxW, xScale, yScale) {
     '" fill="' + fill +
     '" fill-opacity="' + opacity +
     '" stroke="black" stroke-width="0.5" />';
+};
+
+var makeCircles = function(points, i, maxW, xScale, yScale) {
+  if (i === points.length) {
+    return '';
+  } else {
+    return makeCircle(points[i], maxW, xScale, yScale) +
+      '\n' +
+      makeCircles(points, i + 1, maxW, xScale, yScale);
+  }
+};
+
+var makeDTicks = function(i, xScale, axisY) {
+  if (i === dGrid.length) {
+    return '';
+  } else {
+    var d = dGrid[i];
+    var x = xScale(d);
+
+    return '<line x1="' + x + '" y1="' + axisY +
+      '" x2="' + x + '" y2="' + (axisY + 6) +
+      '" stroke="black" />' +
+      '<text x="' + x + '" y="' + (axisY + 24) +
+      '" text-anchor="middle" font-size="12">' + d + '</text>' +
+      '\n' +
+      makeDTicks(i + 1, xScale, axisY);
+  }
+};
+
+var makeCTicks = function(i, yScale, axisX) {
+  if (i === cGrid.length) {
+    return '';
+  } else {
+    var c = cGrid[i];
+    var y = yScale(c);
+
+    return '<line x1="' + (axisX - 6) + '" y1="' + y +
+      '" x2="' + axisX + '" y2="' + y +
+      '" stroke="black" />' +
+      '<text x="' + (axisX - 10) + '" y="' + (y + 4) +
+      '" text-anchor="end" font-size="12">' + c + '</text>' +
+      '\n' +
+      makeCTicks(i + 1, yScale, axisX);
+  }
 };
 
 var drawSVG = function(points) {
@@ -1036,57 +1179,40 @@ var drawSVG = function(points) {
     return top + plotH - (c - cMin) / (cMax - cMin) * plotH;
   };
 
-  var maxW = maxWeight(points);
+  var axisY = top + plotH;
+  var axisX = left;
 
-  var circles = map(function(p) {
-    return makeCircle(p, maxW, xScale, yScale);
-  }, points).join('\n');
+  var maxW = maxPosteriorWeight(points, 0, 0);
 
-  var xAxis = '<line x1="' + left + '" y1="' + (top + plotH) +
-    '" x2="' + (left + plotW) + '" y2="' + (top + plotH) +
+  var xAxis =
+    '<line x1="' + left + '" y1="' + axisY +
+    '" x2="' + (left + plotW) + '" y2="' + axisY +
     '" stroke="black" stroke-width="1" />';
 
-  var yAxis = '<line x1="' + left + '" y1="' + top +
-    '" x2="' + left + '" y2="' + (top + plotH) +
+  var yAxis =
+    '<line x1="' + axisX + '" y1="' + top +
+    '" x2="' + axisX + '" y2="' + axisY +
     '" stroke="black" stroke-width="1" />';
-
-  var dTicks = map(function(d) {
-    var x = xScale(d);
-    return '<line x1="' + x + '" y1="' + (top + plotH) +
-      '" x2="' + x + '" y2="' + (top + plotH + 6) +
-      '" stroke="black" />' +
-      '<text x="' + x + '" y="' + (top + plotH + 24) +
-      '" text-anchor="middle" font-size="12">' + d + '</text>';
-  }, dGrid).join('\n');
-
-  var cTicks = map(function(c) {
-    var y = yScale(c);
-    return '<line x1="' + (left - 6) + '" y1="' + y +
-      '" x2="' + left + '" y2="' + y +
-      '" stroke="black" />' +
-      '<text x="' + (left - 10) + '" y="' + (y + 4) +
-      '" text-anchor="end" font-size="12">' + c + '</text>';
-  }, cGrid).join('\n');
-
-  var labels =
-    '<text x="' + (left + plotW / 2) +
-    '" y="' + (height - 20) +
-    '" text-anchor="middle" font-size="16">d = diszkriminabilitás</text>' +
-
-    '<text x="24" y="' + (top + plotH / 2) +
-    '" text-anchor="middle" font-size="16" transform="rotate(-90 24 ' +
-    (top + plotH / 2) + ')">c = válaszbias / kritérium</text>';
 
   var title =
     '<text x="' + (width / 2) +
     '" y="28" text-anchor="middle" font-size="18" font-weight="bold">' +
-    'King–Ace SDT posterior: d-c diagram</text>';
+    'King-Ace SDT posterior: d-c diagram</text>';
+
+  var labels =
+    '<text x="' + (left + plotW / 2) +
+    '" y="' + (height - 20) +
+    '" text-anchor="middle" font-size="16">d = diszkriminabilitas</text>' +
+
+    '<text x="24" y="' + (top + plotH / 2) +
+    '" text-anchor="middle" font-size="16" transform="rotate(-90 24 ' +
+    (top + plotH / 2) + ')">c = valaszbias / kriterium</text>';
 
   var legend =
-    '<circle cx="560" cy="70" r="8" fill="#999999" fill-opacity="0.45" stroke="black" />' +
-    '<text x="578" y="75" font-size="13">mentális modell</text>' +
-    '<circle cx="560" cy="95" r="8" fill="#111111" fill-opacity="0.55" stroke="black" />' +
-    '<text x="578" y="100" font-size="13">intuicionista modell</text>';
+    '<circle cx="545" cy="70" r="8" fill="#999999" fill-opacity="0.45" stroke="black" />' +
+    '<text x="565" y="75" font-size="13">mentalis modell</text>' +
+    '<circle cx="545" cy="95" r="8" fill="#111111" fill-opacity="0.60" stroke="black" />' +
+    '<text x="565" y="100" font-size="13">intuicionista modell</text>';
 
   return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width +
     '" height="' + height + '">' +
@@ -1094,54 +1220,27 @@ var drawSVG = function(points) {
     title +
     xAxis +
     yAxis +
-    dTicks +
-    cTicks +
-    circles +
+    makeDTicks(0, xScale, axisY) +
+    makeCTicks(0, yScale, axisX) +
+    makeCircles(points, 0, maxW, xScale, yScale) +
     labels +
     legend +
     '</svg>';
 };
 
-var points = makePosteriorPoints();
-
 console.log(drawSVG(points));
 ```
 
-Futtatás:
-
-```bash
-webppl king_ace_two_model_sdt_plot.wppl > king_ace_dc_diagram.svg
-```
-
-Ezután a képet meg lehet nyitni böngészőben:
+Megnyitás:
 
 ```bash
 open king_ace_dc_diagram.svg
 ```
 
-vagy Linuxon például:
+vagy Linuxon:
 
 ```bash
 xdg-open king_ace_dc_diagram.svg
 ```
 
-Az ábra olvasása:
-
-```text
-jobbra lévő pacák  = nagyobb d, jobb jel-zaj megkülönböztetés
-balra lévő pacák   = kisebb d, gyengébb megkülönböztetés
-
-magasan lévő pacák = pozitív c, óvatosabb "érvényes" válasz
-lent lévő pacák    = negatív c, bátrabb "érvényes" válasz
-```
-
-A két modell együtt jelenik meg:
-
-```text
-szürke pacák = mentális modell
-fekete pacák = intuicionista modell
-```
-
-Ha az adatok inkább az intuicionista modellhez illeszkednek, akkor a fekete pacák lesznek nagyobbak.
-
-Ha az adatok inkább a mentális modellhez illeszkednek, akkor a szürke pacák lesznek nagyobbak.
+Ha megint hibát dob, a legelső sort küldd át, ne az egész stack trace-t — WebPPL-nél általában abból látszik a lényeg.
