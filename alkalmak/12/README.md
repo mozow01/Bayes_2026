@@ -872,3 +872,276 @@ observe(Bernoulli({p: p}), 0);
 ```
 
 Így az itemenkénti válaszarányokat modellezzük, és nem futunk bele a `0/1` kontra `true/false` problémába.
+
+## 13. `d`–`c` diagram WebPPL-ből
+
+A WebPPL nem klasszikus ábrarajzoló program, de tudunk vele SVG-képet generáltatni.
+
+Az SVG egy böngészőben megnyitható vektoros kép.
+
+A cél:
+
+```text
+x tengely = d
+y tengely = c
+paca mérete = posterior valószínűség
+```
+
+Vagyis a nagyobb pacák azt mutatják, hogy a modell szerint azok a `d`–`c` értékek magyarázzák jobban az adatokat.
+
+Fontos:
+
+```text
+Ha SVG-t akarunk menteni, akkor a program ne írjon ki mást,
+csak magát az SVG-kódot.
+```
+
+Ezért a diagramhoz érdemes külön fájlt készíteni, például:
+
+```text
+king_ace_two_model_sdt_plot.wppl
+```
+
+A fájl eleje ugyanaz legyen, mint az előző modellben:
+
+```text
+items
+candidateModels
+isSignal
+erf
+phi
+clamp
+pValid
+dGrid
+cGrid
+```
+
+A korábbi `console.log` sorokat viszont töröljük vagy kommentezzük ki.
+
+Ezután a fájl végére jöhet ez a diagramgeneráló rész:
+
+```javascript
+// ---------- d-c diagram SVG-ben ----------
+
+var itemLogLikelihood = function(modelName, d, c, item) {
+  var signal = isSignal(modelName, item.id);
+  var p = pValid(signal, d, c);
+  return Binomial({p: p, n: item.n}).score(item.y);
+};
+
+var sumLogLikelihood = function(i, modelName, d, c) {
+  if (i === items.length) {
+    return 0;
+  } else {
+    return itemLogLikelihood(modelName, d, c, items[i]) +
+      sumLogLikelihood(i + 1, modelName, d, c);
+  }
+};
+
+var makePosteriorPoints = function() {
+  var raw = [];
+  var maxLogW = -1000000000;
+
+  map(function(modelName) {
+    map(function(d) {
+      map(function(c) {
+        var logPrior =
+          Math.log(0.5) +
+          Math.log(1.0 / dGrid.length) +
+          Math.log(1.0 / cGrid.length);
+
+        var logW = logPrior + sumLogLikelihood(0, modelName, d, c);
+
+        raw.push({
+          model: modelName,
+          d: d,
+          c: c,
+          logW: logW
+        });
+
+        if (logW > maxLogW) {
+          maxLogW = logW;
+        }
+      }, cGrid);
+    }, dGrid);
+  }, candidateModels);
+
+  var total = 0;
+
+  map(function(p) {
+    total = total + Math.exp(p.logW - maxLogW);
+  }, raw);
+
+  return map(function(p) {
+    return {
+      model: p.model,
+      d: p.d,
+      c: p.c,
+      weight: Math.exp(p.logW - maxLogW) / total
+    };
+  }, raw);
+};
+
+var maxWeight = function(points) {
+  var m = 0;
+
+  map(function(p) {
+    if (p.weight > m) {
+      m = p.weight;
+    }
+  }, points);
+
+  return m;
+};
+
+var makeCircle = function(p, maxW, xScale, yScale) {
+  var x = xScale(p.d);
+  var y = yScale(p.c);
+
+  var r = 2 + 20 * Math.sqrt(p.weight / maxW);
+
+  var fill = p.model === 'mental_model' ? '#999999' : '#111111';
+  var opacity = p.model === 'mental_model' ? 0.45 : 0.55;
+
+  return '<circle cx="' + x.toFixed(1) +
+    '" cy="' + y.toFixed(1) +
+    '" r="' + r.toFixed(1) +
+    '" fill="' + fill +
+    '" fill-opacity="' + opacity +
+    '" stroke="black" stroke-width="0.5" />';
+};
+
+var drawSVG = function(points) {
+  var width = 760;
+  var height = 520;
+
+  var left = 80;
+  var right = 40;
+  var top = 50;
+  var bottom = 70;
+
+  var plotW = width - left - right;
+  var plotH = height - top - bottom;
+
+  var dMin = 0.0;
+  var dMax = 3.6;
+  var cMin = -1.6;
+  var cMax = 1.6;
+
+  var xScale = function(d) {
+    return left + (d - dMin) / (dMax - dMin) * plotW;
+  };
+
+  var yScale = function(c) {
+    return top + plotH - (c - cMin) / (cMax - cMin) * plotH;
+  };
+
+  var maxW = maxWeight(points);
+
+  var circles = map(function(p) {
+    return makeCircle(p, maxW, xScale, yScale);
+  }, points).join('\n');
+
+  var xAxis = '<line x1="' + left + '" y1="' + (top + plotH) +
+    '" x2="' + (left + plotW) + '" y2="' + (top + plotH) +
+    '" stroke="black" stroke-width="1" />';
+
+  var yAxis = '<line x1="' + left + '" y1="' + top +
+    '" x2="' + left + '" y2="' + (top + plotH) +
+    '" stroke="black" stroke-width="1" />';
+
+  var dTicks = map(function(d) {
+    var x = xScale(d);
+    return '<line x1="' + x + '" y1="' + (top + plotH) +
+      '" x2="' + x + '" y2="' + (top + plotH + 6) +
+      '" stroke="black" />' +
+      '<text x="' + x + '" y="' + (top + plotH + 24) +
+      '" text-anchor="middle" font-size="12">' + d + '</text>';
+  }, dGrid).join('\n');
+
+  var cTicks = map(function(c) {
+    var y = yScale(c);
+    return '<line x1="' + (left - 6) + '" y1="' + y +
+      '" x2="' + left + '" y2="' + y +
+      '" stroke="black" />' +
+      '<text x="' + (left - 10) + '" y="' + (y + 4) +
+      '" text-anchor="end" font-size="12">' + c + '</text>';
+  }, cGrid).join('\n');
+
+  var labels =
+    '<text x="' + (left + plotW / 2) +
+    '" y="' + (height - 20) +
+    '" text-anchor="middle" font-size="16">d = diszkriminabilitás</text>' +
+
+    '<text x="24" y="' + (top + plotH / 2) +
+    '" text-anchor="middle" font-size="16" transform="rotate(-90 24 ' +
+    (top + plotH / 2) + ')">c = válaszbias / kritérium</text>';
+
+  var title =
+    '<text x="' + (width / 2) +
+    '" y="28" text-anchor="middle" font-size="18" font-weight="bold">' +
+    'King–Ace SDT posterior: d-c diagram</text>';
+
+  var legend =
+    '<circle cx="560" cy="70" r="8" fill="#999999" fill-opacity="0.45" stroke="black" />' +
+    '<text x="578" y="75" font-size="13">mentális modell</text>' +
+    '<circle cx="560" cy="95" r="8" fill="#111111" fill-opacity="0.55" stroke="black" />' +
+    '<text x="578" y="100" font-size="13">intuicionista modell</text>';
+
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width +
+    '" height="' + height + '">' +
+    '<rect width="100%" height="100%" fill="white" />' +
+    title +
+    xAxis +
+    yAxis +
+    dTicks +
+    cTicks +
+    circles +
+    labels +
+    legend +
+    '</svg>';
+};
+
+var points = makePosteriorPoints();
+
+console.log(drawSVG(points));
+```
+
+Futtatás:
+
+```bash
+webppl king_ace_two_model_sdt_plot.wppl > king_ace_dc_diagram.svg
+```
+
+Ezután a képet meg lehet nyitni böngészőben:
+
+```bash
+open king_ace_dc_diagram.svg
+```
+
+vagy Linuxon például:
+
+```bash
+xdg-open king_ace_dc_diagram.svg
+```
+
+Az ábra olvasása:
+
+```text
+jobbra lévő pacák  = nagyobb d, jobb jel-zaj megkülönböztetés
+balra lévő pacák   = kisebb d, gyengébb megkülönböztetés
+
+magasan lévő pacák = pozitív c, óvatosabb "érvényes" válasz
+lent lévő pacák    = negatív c, bátrabb "érvényes" válasz
+```
+
+A két modell együtt jelenik meg:
+
+```text
+szürke pacák = mentális modell
+fekete pacák = intuicionista modell
+```
+
+Ha az adatok inkább az intuicionista modellhez illeszkednek, akkor a fekete pacák lesznek nagyobbak.
+
+Ha az adatok inkább a mentális modellhez illeszkednek, akkor a szürke pacák lesznek nagyobbak.
