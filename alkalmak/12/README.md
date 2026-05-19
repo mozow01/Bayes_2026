@@ -253,14 +253,15 @@ c
 
 A hat item:
 
-| item | premissza | konklúzió |
-|---|---|---|
-| Q1 | `(K → A) ∨ (¬K → A)` | `A` |
-| Q2 | `(K → A) ∨ (¬K → A)` | `¬A` |
-| Q3 | `(K → A) ∧ (¬K → A)` | `A` |
-| Q4 | `(K → A) ∧ (¬K → A)` | `¬A` |
-| Q5 | `(K → A) ⊕ (¬K → A)` | `A` |
-| Q6 | `(K → A) ⊕ (¬K → A)` | `¬A` |
+| item | konnektívum | premissza | konklúzió | mentális modell | intuicionista modell |
+|---|---|---|---|---|---|
+| Q1 | vagy | Ha király van a kezemben, akkor ász is van, vagy ha nem király van a kezemben, akkor is ász van. | Van ász a kezemben. | jel | zaj |
+| Q2 | vagy | Ha király van a kezemben, akkor ász is van, vagy ha nem király van a kezemben, akkor is ász van. | Nincs ász a kezemben. | zaj | zaj |
+| Q3 | és | Ha király van a kezemben, akkor ász is van, és ha nem király van a kezemben, akkor is ász van. | Van ász a kezemben. | jel | jel |
+| Q4 | és | Ha király van a kezemben, akkor ász is van, és ha nem király van a kezemben, akkor is ász van. | Nincs ász a kezemben. | zaj | zaj |
+| Q5 | kizáró vagy | Vagy az van, hogy ha király van a kezemben, akkor ász is van, vagy az van, hogy ha nem király van a kezemben, akkor is ász van. | Van ász a kezemben. | jel | zaj |
+| Q6 | kizáró vagy | Vagy az van, hogy ha király van a kezemben, akkor ász is van, vagy az van, hogy ha nem király van a kezemben, akkor is ász van. | Nincs ász a kezemben. | zaj | jel |
+
 
 A két modell jel–zaj címkézése:
 
