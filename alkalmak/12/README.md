@@ -604,12 +604,18 @@ var maxPosteriorWeight = function(points, i, currentMax) {
 var makeCircle = function(p, maxW, xScale, yScale) {
   var x = xScale(p.d);
   var y = yScale(p.c);
+
   var r = 2 + 20 * Math.sqrt(p.weight / maxW);
-  var fill = p.model === 'mental_model' ? '#999999' : '#111111';
-  var opacity = p.model === 'mental_model' ? 0.45 : 0.60;
-  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) +
-    '" r="' + r.toFixed(1) + '" fill="' + fill +
-    '" fill-opacity="' + opacity + '" stroke="black" stroke-width="0.5" />';
+
+  var fill = p.model === 'mental_model' ? '#4E79A7' : '#F28E2B';
+  var opacity = p.model === 'mental_model' ? 0.55 : 0.65;
+
+  return '<circle cx="' + x.toFixed(1) +
+    '" cy="' + y.toFixed(1) +
+    '" r="' + r.toFixed(1) +
+    '" fill="' + fill +
+    '" fill-opacity="' + opacity +
+    '" stroke="#222222" stroke-width="0.6" />';
 };
 
 var makeCircles = function(points, i, maxW, xScale, yScale) {
@@ -692,10 +698,11 @@ var drawSVG = function(points) {
     '" text-anchor="middle" font-size="16" transform="rotate(-90 24 ' +
     (top + plotH / 2) + ')">c = criterion / bias</text>';
 
-  var legend = '<circle cx="545" cy="70" r="8" fill="#999999" fill-opacity="0.45" stroke="black" />' +
-    '<text x="565" y="75" font-size="13">mental model</text>' +
-    '<circle cx="545" cy="95" r="8" fill="#111111" fill-opacity="0.60" stroke="black" />' +
-    '<text x="565" y="100" font-size="13">intuitionistic model</text>';
+  var legend =
+  '<circle cx="545" cy="70" r="8" fill="#4E79A7" fill-opacity="0.55" stroke="#222222" />' +
+  '<text x="565" y="75" font-size="13">mentalis modell</text>' +
+  '<circle cx="545" cy="95" r="8" fill="#F28E2B" fill-opacity="0.65" stroke="#222222" />' +
+  '<text x="565" y="100" font-size="13">intuicionista modell</text>';
 
   return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width +
     '" height="' + height + '">' +
